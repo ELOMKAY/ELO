@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFI Go Ticket</title>
+    <title>TFI Go - Buy Ticket</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,13 +16,13 @@
             min-height: 100vh;
         }
 
-        .ticket-container {
+        .buy-container {
             width: 100%;
             max-width: 100%;
             margin: 0 auto;
             background-color: white;
             text-align: center;
-            padding: 0 0 80px;
+            padding: 20px 0 80px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             flex: 1;
             position: relative;
@@ -36,7 +36,7 @@
             font-weight: bold;
             text-align: center;
             border-radius: 0;
-            margin-bottom: 0;
+            margin-bottom: 20px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -56,241 +56,47 @@
             position: absolute;
             left: 20px;
             filter: brightness(0) invert(1);
-        }
-
-        .bus-logo {
-            width: 340px;
-            height: auto;
-            margin-top: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .origin-destination {
-            font-size: 14px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .origin-destination .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 8px 0;
-        }
-
-        .origin-destination .row strong {
-            flex: 1;
-            text-align: left;
-            font-weight: normal;
-            font-size: 18px;
-        }
-
-        .origin-destination .row span {
-            flex: 1;
-            text-align: right;
-            font-weight: normal;
-            font-size: 18px;
-        }
-
-        .origin-destination .row span.origin-text,
-        .origin-destination .row span.destination-text {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00453c;
-            text-transform: uppercase;
-        }
-
-        .origin-destination .or-separator {
-            font-size: 18px;
-            margin: 10px 0;
-            color: #555;
-            text-align: center;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .origin-destination .or-separator span {
-            text-transform: lowercase;
-        }
-
-        .origin-destination .or-separator::before,
-        .origin-destination .or-separator::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #ddd;
-            margin: auto;
-        }
-
-        .origin-destination .or-separator::before {
-            margin-right: 8px;
-        }
-
-        .origin-destination .or-separator::after {
-            margin-left: 8px;
-        }
-
-        .validation-circle {
-            width: 280px;
-            height: 280px;
-            background-color: #5c068c;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 100px auto 20px;
-            position: relative;
             cursor: pointer;
-            z-index: 10;
-            animation: pulse 1.5s infinite ease-in-out;
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(0.95);
-            }
-            100% {
-                transform: scale(1);
-            }
+        .input-group {
+            margin: 20px auto;
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
         }
 
-        .validation-circle::before {
-            content: '';
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            border: 29px solid #af93e6;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite ease-in-out;
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 18px;
+            color: #00453c;
+            font-weight: bold;
         }
 
-        .validation-circle span {
-            font-size: 40px;
-            font-weight: normal;
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .save-btn {
+            background-color: #5c068c;
             color: white;
-            text-transform: uppercase;
-            animation: spin 3s linear infinite;
-            z-index: 15;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s;
         }
 
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .validation-circle-arrow {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            animation-duration: 4s;
-            animation-iteration-count: infinite;
-            animation-timing-function: linear;
-            filter: brightness(0) invert(1);
-            z-index: 15;
-        }
-
-        .validation-circle-arrow.arrow-1 {
-            top: 20%;
-            left: -50px;
-            animation-name: spin-clockwise;
-        }
-
-        .validation-circle-arrow.arrow-2 {
-            top: 80%;
-            left: -50px;
-            animation-name: spin-counterclockwise;
-        }
-
-        .validation-circle-arrow.arrow-3 {
-            top: 10%;
-            right: -50px;
-            animation-name: spin-clockwise;
-        }
-
-        .validation-circle-arrow.arrow-4 {
-            top: 50%;
-            right: -50px;
-            animation-name: spin-counterclockwise;
-        }
-
-        .validation-circle-arrow.arrow-5 {
-            top: 90%;
-            right: -50px;
-            animation-name: spin-clockwise;
-        }
-
-        @keyframes spin-clockwise {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes spin-counterclockwise {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(-360deg);
-            }
-        }
-
-        .translucent-box {
-            position: absolute;
-            top: calc(25% - 70px);
-            left: 0;
-            right: 0;
-            height: calc(300px + 60px);
-            background-color: rgba(175, 147, 230, 0.5);
-            z-index: 5;
-            overflow: visible;
-        }
-
-        .activation-time {
-            font-size: 40px;
-            font-weight: normal;
-            color: #000000;
-            position: absolute;
-            z-index: 20;
-            animation: constrainedDiagonalMove 25s linear infinite;
-            white-space: nowrap;
-            text-align: center;
-            width: 200px;
-            margin-left: -100px;
-        }
-
-        @keyframes constrainedDiagonalMove {
-            0% {
-                bottom: 20px;
-                left: 25%;
-            }
-            25% {
-                bottom: calc(100% - 70px);
-                left: 75%;
-            }
-            50% {
-                bottom: 20px;
-                left: 75%;
-            }
-            75% {
-                bottom: calc(100% - 70px);
-                left: 25%;
-            }
-            100% {
-                bottom: 20px;
-                left: 25%;
-            }
+        .save-btn:hover {
+            background-color: #4a056e;
         }
 
         .footer {
@@ -338,152 +144,34 @@
         .footer button:nth-child(2) img {
             filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
         }
-
-        .arrow-above-or,
-        .arrow-below-or {
-            font-size: 24px;
-            font-weight: bold;
-            color: #5c068c;
-            margin: 5px 0;
-            display: inline-block;
-            position: relative;
-        }
-
-        .arrow-above-or::before,
-        .arrow-below-or::before {
-            content: '';
-            display: inline-block;
-            width: 30px;
-            height: 12px;
-            background-color: #5c068c;
-            clip-path: polygon(0 40%, 70% 40%, 70% 0, 100% 50%, 70% 100%, 70% 60%, 0 60%);
-            transform: scale(0.8);
-        }
-
-        .ticket-details {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-top: 1px solid #ddd;
-            text-align: left;
-            position: relative;
-            z-index: 20;
-        }
-
-        .ticket-details p {
-            margin: 15px 0;
-            font-size: 16px;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .ticket-details strong {
-            font-weight: normal;
-            font-size: 18px;
-        }
-
-        .ticket-details p span,
-        .ticket-details p br + span {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00453c;
-        }
-
-        .ticket-details p:last-child {
-            margin-top: 30px;
-            font-size: 16px;
-        }
-
-        .qr-code {
-            width: 95%;
-            max-width: 350px;
-            height: auto;
-            margin: 20px auto 20px;
-            display: block;
-            position: relative;
-            z-index: 20;
-        }
-
-        .tfigo-logo {
-            width: 100px;
-            height: auto;
-            margin: 0 20px 0 auto;
-            display: block;
-            position: relative;
-            z-index: 20;
-        }
     </style>
 </head>
 <body>
-
-    <div class="ticket-container">
+    <div class="buy-container">
         <div class="header">
-            <img src="Exit.png" alt="Exit" class="exit-arrow">
-            <span>Ticket</span>
+            <img src="Exit.png" alt="Exit" class="exit-arrow" onclick="window.history.back()">
+            <span>Buy Ticket</span>
         </div>
         
-        <img src="BusEireannLogo.png" alt="Bus Éireann" class="bus-logo">
+        <div class="input-group">
+            <label for="origin">Origin</label>
+            <input type="text" id="origin" placeholder="Enter origin location">
+        </div>
         
-        <div class="origin-destination">
-            <div class="row">
-                <strong>Origin</strong>
-                <span>Destination</span>
-            </div>
-            <div class="row">
-                <span class="origin-text" style="text-align: left;">ABBEY ROAD</span>
-                <span class="destination-text" style="text-align: right;">DUNSHAUGHLIN</span>
-            </div>
-            <div class="arrow-above-or"></div>
-            <div class="or-separator">
-                <span>or</span>
-            </div>
-            <div class="arrow-below-or"></div>
-            <div class="row">
-                <strong>Origin</strong>
-                <span>Destination</span>
-            </div>
-            <div class="row">
-                <span class="origin-text" style="text-align: left;">DUNSHAUGHLIN</span>
-                <span class="destination-text" style="text-align: right;">ABBEY ROAD</span>
-            </div>
+        <div class="input-group">
+            <label for="destination">Destination</label>
+            <input type="text" id="destination" placeholder="Enter destination location">
         </div>
-
-        <div class="validation-circle" onclick="alignArrows()">
-            <span>YA/S</span>
-            <img src="pa.png" alt="Arrow" class="validation-circle-arrow arrow-1">
-            <img src="pa.png" alt="Arrow" class="validation-circle-arrow arrow-2">
-            <img src="pa.png" alt="Arrow" class="validation-circle-arrow arrow-3">
-            <img src="pa.png" alt="Arrow" class="validation-circle-arrow arrow-4">
-            <img src="pa.png" alt="Arrow" class="validation-circle-arrow arrow-5">
-        </div>
-
-        <div class="translucent-box">
-            <div class="activation-time" id="activation-time">Loading...</div>
-        </div>
-
-        <div class="ticket-details">
-            <p><strong>Name</strong><br><span>Mukundi Mhondera</span></p>
-            <p><strong>Passenger</strong><br><span>Young Adult / Student</span></p>
-            <p><strong>Operator</strong><br><span>Bus Eireann</span></p>
-            <p><strong>Ticket-ID</strong><br><span id="ticket-id">4260850</span></p>
-            <p><strong>Origin</strong><br><span>Ardboyne Hotel</span></p>
-            <p><strong>Destination</strong><br><span>Dunshaughlin</span></p>
-            <p><strong>Activation</strong><br><span id="activation-date">23/03/2025, 19:18</span></p>
-            <p><strong>Valid Until</strong><br><span id="valid-until-date">23/03/2025, 23:18</span></p>
-            <p>Expires 28 days after purchase. Valid for 1 journey between origin and destination for one Young Adult/Student (Valid Young Adult/Student ID Required). Valid for 90 minutes after activation.</p>
-        </div>
-
-        <img src="TFIGOLOGO.png" alt="TFIGO Logo" class="tfigo-logo">
-
-        <img src="QR.png" alt="QR Code" class="qr-code">
+        
+        <button class="save-btn" onclick="saveLocations()">Save Locations</button>
     </div>
 
     <div class="footer">
-        <button>
+        <button onclick="window.location.href='buy.html'">
             <img src="EuroSign.png" alt="Euro Icon">
             Buy
         </button>
-        <button>
+        <button onclick="window.location.href='index.html'">
             <img src="TicketIcon.png" alt="Ticket Icon">
             Tickets
         </button>
@@ -494,53 +182,30 @@
     </div>
 
     <script>
-        function generateRandomTicketId() {
-            return Math.floor(1000000 + Math.random() * 9000000);
+        function saveLocations() {
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+            
+            if (origin && destination) {
+                localStorage.setItem('ticketOrigin', origin);
+                localStorage.setItem('ticketDestination', destination);
+                window.location.href = 'index.html';
+            } else {
+                alert('Please enter both origin and destination');
+            }
         }
 
-        function formatDateTime(date) {
-            const time = date.toLocaleTimeString('en-GB', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-            });
-            const day = date.getDate();
-            const month = date.toLocaleString('en-GB', { month: 'short' });
-            return `${time} ${day} ${month}`;
-        }
-
-        document.getElementById("ticket-id").textContent = generateRandomTicketId();
-
-        const now = new Date();
-        const validUntil = new Date(now.getTime() + 4 * 60 * 60 * 1000);
-
-        document.getElementById("activation-date").textContent = formatDateTime(now);
-        document.getElementById("valid-until-date").textContent = formatDateTime(validUntil);
-
-        function updateDateTime() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-GB', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-            });
-            const day = now.getDate();
-            const month = now.toLocaleString('en-GB', { month: 'short' });
-            document.getElementById("activation-time").textContent = `${time} ${day} ${month}`;
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-
-        function alignArrows() {
-            document.querySelectorAll('.validation-circle-arrow').forEach(arrow => {
-                arrow.style.transform = "rotate(0deg)";
-            });
-        }
-
-        document.querySelector('.exit-arrow').addEventListener('click', function() {
-            window.history.back();
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedOrigin = localStorage.getItem('ticketOrigin');
+            const savedDestination = localStorage.getItem('ticketDestination');
+            
+            if (savedOrigin) {
+                document.getElementById('origin').value = savedOrigin;
+            }
+            if (savedDestination) {
+                document.getElementById('destination').value = savedDestination;
+            }
         });
     </script>
-
 </body>
 </html>
