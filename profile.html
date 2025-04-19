@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFI Go - Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .profile-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            text-align: center;
+            padding-bottom: 80px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .header {
+            background-color: #00796b;
+            color: white;
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header span {
+            flex: 1;
+            text-align: center;
+        }
+
+        .exit-arrow {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            left: 20px;
+            filter: brightness(0) invert(1);
+            cursor: pointer;
+        }
+
+        .profile-picture-container {
+            margin: 30px auto;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid #00796b;
+            cursor: pointer;
+        }
+
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .profile-picture-placeholder {
+            font-size: 50px;
+            color: #00796b;
+        }
+
+        .upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: #5c068c;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .name-input {
+            margin: 20px auto;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .name-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 18px;
+            color: #00453c;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .name-input input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .spending-summary {
+            margin: 30px auto;
+            width: 90%;
+            max-width: 500px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .spending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .spending-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00453c;
+        }
+
+        .spending-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #5c068c;
+        }
+
+        .time-period-selector {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+
+        .time-period {
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .time-period.active {
+            background-color: #00796b;
+            color: white;
+        }
+
+        .journey-history {
+            margin: 30px auto;
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .journey-history h3 {
+            color: #00453c;
+            border-bottom: 2px solid #00796b;
+            padding-bottom: 5px;
+        }
+
+        .journey-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        .journey-route {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .journey-details {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .journey-price {
+            color: #5c068c;
+            font-weight: bold;
+        }
+
+        .journey-actions {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .complete-btn {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .complete-btn.completed {
+            background-color: #5c068c;
+        }
+
+        .delete-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reset-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .save-btn {
+            background-color: #5c068c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s;
+        }
+
+        .save-btn:hover {
+            background-color: #4a056e;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .footer button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #585858;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer button.active {
+            color: #00796b;
+        }
+
+        .footer button img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .footer button:first-child img {
+            width: 48px;
+            height: 48px;
+            filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+        }
+
+        .footer button:first-child {
+            margin-top: -4px;
+        }
+
+        .footer button:nth-child(2) img {
+            filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+        }
+
+        .footer button:nth-child(3) img {
+            filter: brightness(0) saturate(100%) invert(27%) sepia(64%) saturate(1518%) hue-rotate(142deg) brightness(93%) contrast(101%);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .delete-confirmation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .delete-confirmation-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .delete-confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .delete-confirmation-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-confirmation-btn.yes {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+        }
+
+        .delete-confirmation-btn.no {
+            background-color: #00796b;
+            color: white;
+            border: none;
+        }
+
+        .delete-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #5c068c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="header">
+            <img src="Exit.png" alt="Exit" class="exit-arrow" onclick="window.history.back()">
+            <span>Profile</span>
+        </div>
+        
+        <div class="profile-picture-container" onclick="document.getElementById('file-input').click()">
+            <div class="profile-picture-placeholder">👤</div>
+            <img id="profile-picture" class="profile-picture" src="" alt="Profile Picture">
+            <button class="upload-btn">+</button>
+            <input type="file" id="file-input" accept="image/*">
+        </div>
+        
+        <div class="name-input">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        
+        <div class="spending-summary">
+            <div class="spending-header">
+                <div class="spending-title">Total Spending</div>
+                <div class="spending-amount" id="total-spending">€0.00</div>
+            </div>
+            <div class="time-period-selector">
+                <div class="time-period active" onclick="filterJourneys('day')">Day</div>
+                <div class="time-period" onclick="filterJourneys('month')">Month</div>
+                <div class="time-period" onclick="filterJourneys('year')">Year</div>
+                <div class="time-period" onclick="filterJourneys('all')">All Time</div>
+            </div>
+            <button class="reset-btn" onclick="resetSpending()">Reset Total Spending</button>
+        </div>
+        
+        <div class="journey-history">
+            <h3>Journey History</h3>
+            <div id="journey-list">
+                <!-- Journey items will be added dynamically -->
+            </div>
+        </div>
+        
+        <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+    </div>
+
+    <div class="footer">
+        <button onclick="window.location.href='buy.html'">
+            <img src="EuroSign.png" alt="Euro Icon">
+            Buy
+        </button>
+        <button onclick="window.location.href='index.html'">
+            <img src="TicketIcon.png" alt="Ticket Icon">
+            Tickets
+        </button>
+        <button class="active" onclick="window.location.href='profile.html'">
+            <img src="PersonIcon.png" alt="Profile Icon">
+            Profile
+        </button>
+    </div>
+
+    <div id="delete-confirmation" class="delete-confirmation" style="display: none;">
+        <div class="delete-confirmation-box">
+            <p>Are you sure you want to delete this journey from your history?</p>
+            <div class="delete-confirmation-buttons">
+                <button class="delete-confirmation-btn yes" onclick="confirmDelete()">Yes</button>
+                <button class="delete-confirmation-btn no" onclick="cancelDelete()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-message" class="delete-message">Delete Complete</div>
+
+    <script>
+        // Current filter
+        let currentFilter = 'day';
+        let journeyToDelete = null;
+        let totalSpending = parseFloat(localStorage.getItem('totalSpending')) || 0;
+        
+        // Load saved profile when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load name
+            const savedName = localStorage.getItem('userName');
+            if (savedName) {
+                document.getElementById('name').value = savedName;
+            }
+
+            // Load profile picture
+            const savedPicture = localStorage.getItem('profilePicture');
+            if (savedPicture) {
+                const profilePic = document.getElementById('profile-picture');
+                profilePic.src = savedPicture;
+                profilePic.style.display = 'block';
+                document.querySelector('.profile-picture-placeholder').style.display = 'none';
+            }
+
+            // Set up file input
+            document.getElementById('file-input').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const profilePic = document.getElementById('profile-picture');
+                        profilePic.src = event.target.result;
+                        profilePic.style.display = 'block';
+                        document.querySelector('.profile-picture-placeholder').style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Load and display journey history
+            loadJourneyHistory();
+            updateTotalSpendingDisplay();
+        });
+
+        function loadJourneyHistory() {
+            const journeyHistory = JSON.parse(localStorage.getItem('journeyHistory')) || [];
+            const journeyList = document.getElementById('journey-list');
+            journeyList.innerHTML = '';
+            
+            if (journeyHistory.length === 0) {
+                journeyList.innerHTML = '<p>No journey history yet.</p>';
+                document.getElementById('total-spending').textContent = '€0.00';
+                return;
+            }
+            
+            // Filter journeys based on current time period
+            const now = new Date();
+            let filteredJourneys = journeyHistory;
+            
+            if (currentFilter === 'day') {
+                filteredJourneys = journeyHistory.filter(journey => {
+                    const journeyDate = new Date(journey.date);
+                    return journeyDate.toDateString() === now.toDateString();
+                });
+            } else if (currentFilter === 'month') {
+                filteredJourneys = journeyHistory.filter(journey => {
+                    const journeyDate = new Date(journey.date);
+                    return journeyDate.getMonth() === now.getMonth() && 
+                           journeyDate.getFullYear() === now.getFullYear();
+                });
+            } else if (currentFilter === 'year') {
+                filteredJourneys = journeyHistory.filter(journey => {
+                    const journeyDate = new Date(journey.date);
+                    return journeyDate.getFullYear() === now.getFullYear();
+                });
+            }
+            
+            // Display filtered journeys
+            filteredJourneys.forEach(journey => {
+                const journeyDate = new Date(journey.date);
+                const formattedDate = journeyDate.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const journeyItem = document.createElement('div');
+                journeyItem.className = 'journey-item';
+                journeyItem.innerHTML = `
+                    <div class="journey-route">
+                        Bus ${journey.bus}: ${journey.origin} → ${journey.destination}
+                    </div>
+                    <div class="journey-details">
+                        <span>${formattedDate}</span>
+                        <span class="journey-price">${journey.price}</span>
+                    </div>
+                    <div class="journey-actions">
+                        <button class="complete-btn ${journey.completed ? 'completed' : ''}" 
+                                onclick="toggleJourneyCompletion(event, '${journey.date}')">
+                            ${journey.completed ? 'Completed' : 'Mark Complete'}
+                        </button>
+                        <button class="delete-btn" onclick="showDeleteConfirmation('${journey.date}')">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+                journeyList.appendChild(journeyItem);
+            });
+        }
+
+        function updateTotalSpendingDisplay() {
+            document.getElementById('total-spending').textContent = `€${totalSpending.toFixed(2)}`;
+        }
+
+        function filterJourneys(period) {
+            // Update active time period
+            document.querySelectorAll('.time-period').forEach(button => {
+                button.classList.remove('active');
+                if (button.textContent.toLowerCase().includes(period)) {
+                    button.classList.add('active');
+                }
+            });
+            
+            currentFilter = period;
+            loadJourneyHistory();
+        }
+
+        function toggleJourneyCompletion(event, journeyDate) {
+            event.stopPropagation();
+            const journeyHistory = JSON.parse(localStorage.getItem('journeyHistory')) || [];
+            
+            const journeyIndex = journeyHistory.findIndex(j => j.date === journeyDate);
+            if (journeyIndex !== -1) {
+                const wasCompleted = journeyHistory[journeyIndex].completed;
+                journeyHistory[journeyIndex].completed = !wasCompleted;
+                localStorage.setItem('journeyHistory', JSON.stringify(journeyHistory));
+                
+                // Update button appearance
+                event.target.classList.toggle('completed');
+                event.target.textContent = journeyHistory[journeyIndex].completed ? 'Completed' : 'Mark Complete';
+                
+                // Update total spending if journey was marked complete
+                if (!wasCompleted && journeyHistory[journeyIndex].completed) {
+                    const priceValue = parseFloat(journeyHistory[journeyIndex].price.replace('€', ''));
+                    totalSpending += priceValue;
+                    localStorage.setItem('totalSpending', totalSpending);
+                    updateTotalSpendingDisplay();
+                }
+            }
+        }
+
+        function showDeleteConfirmation(journeyDate) {
+            journeyToDelete = journeyDate;
+            document.getElementById('delete-confirmation').style.display = 'flex';
+        }
+
+        function confirmDelete() {
+            if (journeyToDelete) {
+                const journeyHistory = JSON.parse(localStorage.getItem('journeyHistory')) || [];
+                const journeyIndex = journeyHistory.findIndex(j => j.date === journeyToDelete);
+                
+                if (journeyIndex !== -1) {
+                    // If journey was completed, subtract its price from total spending
+                    if (journeyHistory[journeyIndex].completed) {
+                        const priceValue = parseFloat(journeyHistory[journeyIndex].price.replace('€', ''));
+                        totalSpending -= priceValue;
+                        localStorage.setItem('totalSpending', totalSpending);
+                    }
+                    
+                    journeyHistory.splice(journeyIndex, 1);
+                    localStorage.setItem('journeyHistory', JSON.stringify(journeyHistory));
+                    
+                    // Show delete message
+                    const deleteMessage = document.getElementById('delete-message');
+                    deleteMessage.style.display = 'block';
+                    setTimeout(() => {
+                        deleteMessage.style.display = 'none';
+                    }, 2000);
+                }
+            }
+            
+            cancelDelete();
+            loadJourneyHistory();
+            updateTotalSpendingDisplay();
+        }
+
+        function cancelDelete() {
+            journeyToDelete = null;
+            document.getElementById('delete-confirmation').style.display = 'none';
+        }
+
+        function resetSpending() {
+            if (confirm("This will reset your spending to 0 and delete all journey history. This action cannot be undone.")) {
+                totalSpending = 0;
+                localStorage.setItem('totalSpending', totalSpending);
+                localStorage.removeItem('journeyHistory');
+                updateTotalSpendingDisplay();
+                loadJourneyHistory();
+            }
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('name').value;
+            const profilePic = document.getElementById('profile-picture').src;
+            
+            if (name) {
+                localStorage.setItem('userName', name);
+                
+                if (profilePic && profilePic !== '') {
+                    localStorage.setItem('profilePicture', profilePic);
+                }
+                
+                alert('Profile saved successfully!');
+                window.location.href = 'index.html';
+            } else {
+                alert('Please enter your name');
+            }
+        }
+    </script>
+</body>
+</html>
