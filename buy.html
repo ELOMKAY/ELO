@@ -10,10 +10,6 @@
             margin: 0;
             padding: 0;
             background-color: #f5f5f5;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
 
         .buy-container {
@@ -22,9 +18,9 @@
             margin: 0 auto;
             background-color: white;
             text-align: center;
-            padding: 20px 0 80px;
+            padding-bottom: 80px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            flex: 1;
+            min-height: 100vh;
             position: relative;
         }
 
@@ -35,8 +31,6 @@
             font-size: 16px;
             font-weight: bold;
             text-align: center;
-            border-radius: 0;
-            margin-bottom: 20px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -59,10 +53,58 @@
             cursor: pointer;
         }
 
-        .input-group {
+        .bus-selection {
             margin: 20px auto;
             width: 90%;
             max-width: 500px;
+            text-align: left;
+            padding-top: 20px;
+        }
+
+        .bus-selection label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 18px;
+            color: #00453c;
+            font-weight: bold;
+        }
+
+        .bus-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .bus-option {
+            background-color: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .bus-option.selected {
+            background-color: #00796b;
+            color: white;
+        }
+
+        .bus-option.favorite {
+            border: 2px solid #5c068c;
+        }
+
+        .stop-selection {
+            display: none;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
             text-align: left;
         }
 
@@ -74,13 +116,52 @@
             font-weight: bold;
         }
 
-        .input-group input {
+        .input-group input, .input-group select {
             width: 100%;
             padding: 12px;
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
+        }
+
+        .suggested-stops {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        .stop-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stop-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .stop-item .star {
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .stop-item .star.favorite {
+            color: #5c068c;
+        }
+
+        .price-display {
+            font-size: 18px;
+            margin: 20px 0;
+            color: #5c068c;
+            font-weight: bold;
+            display: none;
         }
 
         .save-btn {
@@ -105,7 +186,6 @@
             padding: 10px;
             border-top: 1px solid #ddd;
             background-color: white;
-            border-radius: 0 0 8px 8px;
             position: fixed;
             bottom: 0;
             left: 0;
@@ -124,6 +204,10 @@
             align-items: center;
         }
 
+        .footer button.active {
+            color: #00796b;
+        }
+
         .footer button img {
             width: 40px;
             height: 40px;
@@ -135,6 +219,7 @@
         .footer button:first-child img {
             width: 48px;
             height: 48px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(64%) saturate(1518%) hue-rotate(142deg) brightness(93%) contrast(101%);
         }
 
         .footer button:first-child {
@@ -142,6 +227,10 @@
         }
 
         .footer button:nth-child(2) img {
+            filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+        }
+
+        .footer button:nth-child(3) img {
             filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
         }
     </style>
@@ -153,21 +242,36 @@
             <span>Buy Ticket</span>
         </div>
         
-        <div class="input-group">
-            <label for="origin">Origin</label>
-            <input type="text" id="origin" placeholder="Enter origin location">
+        <div class="bus-selection">
+            <label>Select Bus Route</label>
+            <div class="bus-options" id="bus-options">
+                <!-- Bus options will be added dynamically -->
+            </div>
         </div>
         
-        <div class="input-group">
-            <label for="destination">Destination</label>
-            <input type="text" id="destination" placeholder="Enter destination location">
+        <div class="stop-selection" id="stop-selection">
+            <div class="input-group">
+                <label for="origin">Origin</label>
+                <input type="text" id="origin" placeholder="Enter origin location">
+                <div class="suggested-stops" id="origin-suggestions"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="destination">Destination</label>
+                <input type="text" id="destination" placeholder="Enter destination location">
+                <div class="suggested-stops" id="destination-suggestions"></div>
+            </div>
+            
+            <div class="price-display" id="price-display">
+                Ticket Price: <span id="price-amount">€0.00</span>
+            </div>
+            
+            <button class="save-btn" onclick="saveJourney()">Confirm Journey</button>
         </div>
-        
-        <button class="save-btn" onclick="saveLocations()">Save Locations</button>
     </div>
 
     <div class="footer">
-        <button onclick="window.location.href='buy.html'">
+        <button class="active" onclick="window.location.href='buy.html'">
             <img src="EuroSign.png" alt="Euro Icon">
             Buy
         </button>
@@ -175,27 +279,71 @@
             <img src="TicketIcon.png" alt="Ticket Icon">
             Tickets
         </button>
-        <button>
+        <button onclick="window.location.href='profile.html'">
             <img src="PersonIcon.png" alt="Profile Icon">
             Profile
         </button>
     </div>
 
     <script>
-        function saveLocations() {
-            const origin = document.getElementById('origin').value;
-            const destination = document.getElementById('destination').value;
-            
-            if (origin && destination) {
-                localStorage.setItem('ticketOrigin', origin);
-                localStorage.setItem('ticketDestination', destination);
-                window.location.href = 'index.html';
-            } else {
-                alert('Please enter both origin and destination');
-            }
-        }
+        // Bus route data
+        const busRoutes = {
+            "109": [
+                "Kells", "Kilmainham", "Bloomsbury Cross", "Tankardstown", "Mitchells Cross", 
+                "Kells Road", "Blackwater Retail Park", "Navan", "Abbey Road", "Ardboyne Hotel", 
+                "Kilcarn Bridge", "St Columbans", "Garlow Cross", "Tara Cross", "Lismullen", 
+                "Old Ross Road", "Grange Hall", "Dunshaughlin", "The Willows", "Ballymurphy", 
+                "Bush Lane", "Rathbeggan", "Porterstown Lane", "Fairyhouse Cross", "Msd Dunboyne", 
+                "Bracetown Park", "The Fairways Apartments", "N3 Slip Road", "Parkway Station", 
+                "Navan Road", "Phibsborough Po", "Mater Hospital", "O'Connell Street Upper", 
+                "Dublin Busáras"
+            ],
+            "NX": [
+                "Abbey Road", "Ratholdren Road", "Leisure Link", "Russell Court", 
+                "Navan Park And Ride", "Navan", "Limekilnhill", "Meath County Council", 
+                "Johnstown Centre", "Boyne View", "St Columbans", "Garlow Cross", 
+                "N3 Slip Road", "North Circular Road", "Broadstone", "O'Connell Street Upper", 
+                "Irish Life Mall", "Westland Row Church", "Merrion Square", "Wilton Terrace"
+            ],
+            "109A": [
+                "Tower View", "Abbey Road", "Johnstown Centre", "Boyne View", "St Columbans", 
+                "Garlow Cross", "Dunshaughlin", "Steeplechase Hill", "Holy Trinity Church", 
+                "Ballybin Roundabout", "Ashbourne Centre", "Saint John's Wood Court", 
+                "Ashbourne Credit Union", "Ashbourne", "Bourne Avenue", 
+                "Ashbourne Community College", "Hickey's Lane", "Ninemile Stone", 
+                "DCU Collins Avenue", "Dublin Busáras"
+            ]
+        };
 
+        // Updated ticket prices for Young Adult/Student fares
+        const ticketPrices = {
+            "109": {
+                "shortFare": 0.75,
+                "standardFare": 1.00
+            },
+            "NX": {
+                "shortFare": 0.75,
+                "standardFare": 1.00
+            },
+            "109A": {
+                "shortFare": 0.75,
+                "standardFare": 1.00
+            }
+        };
+
+        // Favorites data
+        let favorites = JSON.parse(localStorage.getItem('busFavorites')) || {
+            buses: [],
+            stops: []
+        };
+
+        // Journey history
+        let journeyHistory = JSON.parse(localStorage.getItem('journeyHistory')) || [];
+        let currentBus = null;
+
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data
             const savedOrigin = localStorage.getItem('ticketOrigin');
             const savedDestination = localStorage.getItem('ticketDestination');
             
@@ -205,6 +353,200 @@
             if (savedDestination) {
                 document.getElementById('destination').value = savedDestination;
             }
+
+            // Populate bus options
+            const busOptionsContainer = document.getElementById('bus-options');
+            Object.keys(busRoutes).forEach(busNumber => {
+                const isFavorite = favorites.buses.includes(busNumber);
+                const busOption = document.createElement('div');
+                busOption.className = `bus-option ${isFavorite ? 'favorite' : ''}`;
+                busOption.innerHTML = `
+                    ${busNumber}
+                    <span class="star" onclick="toggleBusFavorite(event, '${busNumber}')">
+                        ${isFavorite ? '★' : '☆'}
+                    </span>
+                `;
+                busOption.onclick = function() {
+                    selectBus(busNumber);
+                };
+                busOptionsContainer.appendChild(busOption);
+            });
+
+            // Set up event listeners for origin/destination inputs
+            document.getElementById('origin').addEventListener('input', function() {
+                showSuggestedStops('origin', this.value);
+            });
+            
+            document.getElementById('destination').addEventListener('input', function() {
+                showSuggestedStops('destination', this.value);
+            });
+        });
+
+        function selectBus(busNumber) {
+            // Update UI
+            const busOptions = document.querySelectorAll('.bus-option');
+            busOptions.forEach(option => {
+                option.classList.remove('selected');
+                if (option.textContent.includes(busNumber)) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Show stop selection
+            document.getElementById('stop-selection').style.display = 'block';
+            currentBus = busNumber;
+            
+            // Clear previous suggestions
+            document.getElementById('origin-suggestions').innerHTML = '';
+            document.getElementById('destination-suggestions').innerHTML = '';
+            document.getElementById('price-display').style.display = 'none';
+        }
+
+        function showSuggestedStops(type, query) {
+            if (!currentBus) return;
+            
+            const suggestionsContainer = document.getElementById(`${type}-suggestions`);
+            suggestionsContainer.innerHTML = '';
+            
+            if (!query) return;
+            
+            const filteredStops = busRoutes[currentBus].filter(stop => 
+                stop.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            filteredStops.forEach(stop => {
+                const isFavorite = favorites.stops.includes(stop);
+                const stopItem = document.createElement('div');
+                stopItem.className = 'stop-item';
+                stopItem.innerHTML = `
+                    ${stop}
+                    <span class="star ${isFavorite ? 'favorite' : ''}" 
+                          onclick="toggleStopFavorite(event, '${stop}')">
+                        ${isFavorite ? '★' : '☆'}
+                    </span>
+                `;
+                stopItem.onclick = function() {
+                    document.getElementById(type).value = stop;
+                    suggestionsContainer.innerHTML = '';
+                    calculatePrice();
+                };
+                suggestionsContainer.appendChild(stopItem);
+            });
+        }
+
+        function calculatePrice() {
+            if (!currentBus) return;
+            
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+            
+            if (!origin || !destination) return;
+            
+            const distance = calculateDistance(origin, destination, currentBus);
+            if (distance === null) return;
+            
+            // Determine fare type based on distance
+            const isShortFare = distance <= 3; // Consider <= 3 stops as short fare
+            const price = isShortFare ? ticketPrices[currentBus].shortFare : ticketPrices[currentBus].standardFare;
+            
+            document.getElementById('price-amount').textContent = `€${price.toFixed(2)}`;
+            document.getElementById('price-display').style.display = 'block';
+        }
+
+        // Function to calculate distance between two stops (simplified for demo)
+        function calculateDistance(origin, destination, busNumber) {
+            const stops = busRoutes[busNumber];
+            const originIndex = stops.indexOf(origin);
+            const destinationIndex = stops.indexOf(destination);
+            
+            if (originIndex === -1 || destinationIndex === -1) return null;
+            
+            return Math.abs(destinationIndex - originIndex);
+        }
+
+        function toggleBusFavorite(event, busNumber) {
+            event.stopPropagation();
+            const index = favorites.buses.indexOf(busNumber);
+            
+            if (index === -1) {
+                favorites.buses.push(busNumber);
+            } else {
+                favorites.buses.splice(index, 1);
+            }
+            
+            localStorage.setItem('busFavorites', JSON.stringify(favorites));
+            
+            // Update UI
+            const starElement = event.target;
+            starElement.textContent = index === -1 ? '★' : '☆';
+            starElement.parentElement.classList.toggle('favorite');
+            
+            // Reorder buses to show favorites first
+            const busOptionsContainer = document.getElementById('bus-options');
+            const busOptions = Array.from(busOptionsContainer.children);
+            
+            busOptions.sort((a, b) => {
+                const aIsFavorite = favorites.buses.includes(a.textContent.trim().split('☆')[0].trim().split('★')[0].trim());
+                const bIsFavorite = favorites.buses.includes(b.textContent.trim().split('☆')[0].trim().split('★')[0].trim());
+                
+                if (aIsFavorite && !bIsFavorite) return -1;
+                if (!aIsFavorite && bIsFavorite) return 1;
+                return 0;
+            });
+            
+            busOptions.forEach(option => busOptionsContainer.appendChild(option));
+        }
+
+        function toggleStopFavorite(event, stop) {
+            event.stopPropagation();
+            const index = favorites.stops.indexOf(stop);
+            
+            if (index === -1) {
+                favorites.stops.push(stop);
+            } else {
+                favorites.stops.splice(index, 1);
+            }
+            
+            localStorage.setItem('busFavorites', JSON.stringify(favorites));
+            
+            // Update UI
+            event.target.classList.toggle('favorite');
+            event.target.textContent = index === -1 ? '★' : '☆';
+        }
+
+        function saveJourney() {
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+            const price = document.getElementById('price-amount').textContent;
+            
+            if (!currentBus || !origin || !destination) {
+                alert('Please select a bus and both origin and destination');
+                return;
+            }
+            
+            // Save locations
+            localStorage.setItem('ticketOrigin', origin);
+            localStorage.setItem('ticketDestination', destination);
+            
+            // Add to journey history
+            const journey = {
+                bus: currentBus,
+                origin: origin,
+                destination: destination,
+                price: price,
+                date: new Date().toISOString(),
+                completed: false
+            };
+            
+            journeyHistory.unshift(journey); // Add to beginning
+            localStorage.setItem('journeyHistory', JSON.stringify(journeyHistory));
+            
+            // Redirect to ticket page
+            window.location.href = 'index.html';
+        }
+
+        document.querySelector('.exit-arrow').addEventListener('click', function() {
+            window.history.back();
         });
     </script>
 </body>
