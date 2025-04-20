@@ -5,6 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFI Go - Profile</title>
     <style>
+        /* Lock Screen Styles */
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #00796b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .lock-screen h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .passcode-input {
+            padding: 10px;
+            font-size: 18px;
+            margin-bottom: 20px;
+            width: 200px;
+            text-align: center;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .passcode-submit {
+            padding: 10px 20px;
+            background-color: #5c068c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .passcode-error {
+            color: #ffcccc;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Main App Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -22,6 +70,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             min-height: 100vh;
             position: relative;
+            display: none;
         }
 
         .header {
@@ -95,6 +144,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .remove-btn {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            display: none;
         }
 
         .name-input {
@@ -190,6 +258,8 @@
         .journey-route {
             font-weight: bold;
             margin-bottom: 5px;
+            word-break: break-word;
+            padding-right: 100px;
         }
 
         .journey-details {
@@ -197,6 +267,7 @@
             justify-content: space-between;
             color: #666;
             font-size: 14px;
+            flex-wrap: wrap;
         }
 
         .journey-price {
@@ -210,6 +281,8 @@
             top: 15px;
             display: flex;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .complete-btn {
@@ -220,6 +293,7 @@
             border-radius: 4px;
             font-size: 12px;
             cursor: pointer;
+            margin-bottom: 5px;
         }
 
         .complete-btn.completed {
@@ -237,6 +311,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 5px;
         }
 
         .reset-btn {
@@ -277,6 +352,7 @@
             left: 0;
             right: 0;
             z-index: 100;
+            display: none;
         }
 
         .footer button {
@@ -385,7 +461,16 @@
     </style>
 </head>
 <body>
-    <div class="profile-container">
+    <!-- Lock Screen -->
+    <div class="lock-screen" id="lockScreen">
+        <h2>Enter Passcode</h2>
+        <input type="password" class="passcode-input" id="passcodeInput" placeholder="Enter passcode">
+        <button class="passcode-submit" onclick="checkPasscode()">Submit</button>
+        <div class="passcode-error" id="passcodeError">Incorrect passcode. Please try again.</div>
+    </div>
+
+    <!-- Main App Content -->
+    <div class="profile-container" id="appContent">
         <div class="header">
             <img src="Exit.png" alt="Exit" class="exit-arrow" onclick="window.history.back()">
             <span>Profile</span>
@@ -395,6 +480,7 @@
             <div class="profile-picture-placeholder">👤</div>
             <img id="profile-picture" class="profile-picture" src="" alt="Profile Picture">
             <button class="upload-btn">+</button>
+            <button class="remove-btn" id="remove-picture-btn" onclick="removeProfilePicture(event)">×</button>
             <input type="file" id="file-input" accept="image/*">
         </div>
         
@@ -427,7 +513,7 @@
         <button class="save-btn" onclick="saveProfile()">Save Profile</button>
     </div>
 
-    <div class="footer">
+    <div class="footer" id="appFooter">
         <button onclick="window.location.href='buy.html'">
             <img src="EuroSign.png" alt="Euro Icon">
             Buy
@@ -455,26 +541,80 @@
     <div id="delete-message" class="delete-message">Delete Complete</div>
 
     <script>
-        // Current filter
-        let currentFilter = 'day';
+        // Passcode and Auto-Lock Functionality
+        const PASSCODE = "T9C9M10";
+        let autoLockTimer;
+        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
         let journeyToDelete = null;
         let totalSpending = parseFloat(localStorage.getItem('totalSpending')) || 0;
-        
-        // Load saved profile when page loads
+        let currentFilter = 'all';
+
+        function checkPasscode() {
+            const input = document.getElementById('passcodeInput').value;
+            const errorElement = document.getElementById('passcodeError');
+            
+            if (input === PASSCODE) {
+                // Correct passcode
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('appFooter').style.display = 'flex';
+                
+                // Start session
+                sessionStorage.setItem('authenticated', 'true');
+                resetAutoLockTimer();
+            } else {
+                // Incorrect passcode
+                errorElement.style.display = 'block';
+                document.getElementById('passcodeInput').value = '';
+            }
+        }
+
+        function resetAutoLockTimer() {
+            // Clear existing timer
+            if (autoLockTimer) {
+                clearTimeout(autoLockTimer);
+            }
+            
+            // Set new timer
+            autoLockTimer = setTimeout(lockApp, LOCK_TIMEOUT);
+        }
+
+        function lockApp() {
+            document.getElementById('lockScreen').style.display = 'flex';
+            document.getElementById('appContent').style.display = 'none';
+            document.getElementById('appFooter').style.display = 'none';
+            document.getElementById('passcodeInput').value = '';
+            document.getElementById('passcodeError').style.display = 'none';
+            sessionStorage.removeItem('authenticated');
+        }
+
+        // Check authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Load name
-            const savedName = localStorage.getItem('userName');
-            if (savedName) {
-                document.getElementById('name').value = savedName;
+            if (sessionStorage.getItem('authenticated') === 'true') {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                document.getElementById('appFooter').style.display = 'flex';
+                resetAutoLockTimer();
+            } else {
+                document.getElementById('lockScreen').style.display = 'flex';
+                document.getElementById('appContent').style.display = 'none';
+                document.getElementById('appFooter').style.display = 'none';
             }
 
-            // Load profile picture
+            // Set up event listeners for user activity
+            document.addEventListener('click', resetAutoLockTimer);
+            document.addEventListener('keypress', resetAutoLockTimer);
+            document.addEventListener('scroll', resetAutoLockTimer);
+            document.addEventListener('mousemove', resetAutoLockTimer);
+
+            // Load saved profile picture
             const savedPicture = localStorage.getItem('profilePicture');
             if (savedPicture) {
                 const profilePic = document.getElementById('profile-picture');
                 profilePic.src = savedPicture;
                 profilePic.style.display = 'block';
                 document.querySelector('.profile-picture-placeholder').style.display = 'none';
+                document.getElementById('remove-picture-btn').style.display = 'flex';
             }
 
             // Set up file input
@@ -487,15 +627,44 @@
                         profilePic.src = event.target.result;
                         profilePic.style.display = 'block';
                         document.querySelector('.profile-picture-placeholder').style.display = 'none';
+                        document.getElementById('remove-picture-btn').style.display = 'flex';
                     };
                     reader.readAsDataURL(file);
                 }
             });
 
+            // Load name
+            const savedName = localStorage.getItem('userName');
+            if (savedName) {
+                document.getElementById('name').value = savedName;
+            }
+
             // Load and display journey history
             loadJourneyHistory();
             updateTotalSpendingDisplay();
         });
+
+        function removeProfilePicture(event) {
+            event.stopPropagation();
+            
+            // Remove picture from display
+            const profilePic = document.getElementById('profile-picture');
+            profilePic.src = '';
+            profilePic.style.display = 'none';
+            document.querySelector('.profile-picture-placeholder').style.display = 'block';
+            document.getElementById('remove-picture-btn').style.display = 'none';
+            
+            // Remove from storage
+            localStorage.removeItem('profilePicture');
+            
+            // Show confirmation
+            const deleteMessage = document.getElementById('delete-message');
+            deleteMessage.textContent = "Profile picture removed";
+            deleteMessage.style.display = 'block';
+            setTimeout(() => {
+                deleteMessage.style.display = 'none';
+            }, 2000);
+        }
 
         function loadJourneyHistory() {
             const journeyHistory = JSON.parse(localStorage.getItem('journeyHistory')) || [];
@@ -647,12 +816,20 @@
         }
 
         function resetSpending() {
-            if (confirm("This will reset your spending to 0 and delete all journey history. This action cannot be undone.")) {
+            if (confirm("Are you sure you want to reset your total spending to €0 and delete all journey history? This action cannot be undone.")) {
                 totalSpending = 0;
                 localStorage.setItem('totalSpending', totalSpending);
                 localStorage.removeItem('journeyHistory');
                 updateTotalSpendingDisplay();
                 loadJourneyHistory();
+                
+                // Show confirmation message
+                const deleteMessage = document.getElementById('delete-message');
+                deleteMessage.textContent = "Spending reset complete";
+                deleteMessage.style.display = 'block';
+                setTimeout(() => {
+                    deleteMessage.style.display = 'none';
+                }, 2000);
             }
         }
 
