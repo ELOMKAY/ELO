@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFI Go - Buy Ticket</title>
     <style>
-        /* Lock Screen Styles */
         .lock-screen {
             position: fixed;
             top: 0;
@@ -52,7 +51,74 @@
             display: none;
         }
 
-        /* Main App Styles */
+        .update-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .update-alert-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .update-alert h2 {
+            color: #5c068c;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .update-alert ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        .update-alert li {
+            margin-bottom: 8px;
+        }
+
+        .update-alert-checkbox {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .update-alert-checkbox input {
+            margin-right: 10px;
+        }
+
+        .update-alert-button {
+            background-color: #5c068c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -76,7 +142,7 @@
         .header {
             background-color: #00796b;
             color: white;
-            padding: 20px;
+            padding: 15px;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
@@ -97,13 +163,13 @@
             width: 20px;
             height: 20px;
             position: absolute;
-            left: 20px;
+            left: 15px;
             filter: brightness(0) invert(1);
             cursor: pointer;
         }
 
         .search-container {
-            margin: 20px auto;
+            margin: 15px auto;
             width: 90%;
             max-width: 500px;
         }
@@ -118,20 +184,21 @@
         }
 
         .stop-selection {
-            margin: 20px auto;
+            margin: 15px auto;
             width: 90%;
             max-width: 500px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: left;
+            position: relative;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 18px;
+            font-size: 16px;
             color: #00453c;
             font-weight: bold;
         }
@@ -145,8 +212,34 @@
             box-sizing: border-box;
         }
 
+        .input-group::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #5c068c;
+            transition: width 0.3s ease;
+        }
+
+        .input-group.input-focused::after {
+            width: 100%;
+        }
+
+        .input-group.input-complete::after {
+            width: 100%;
+            background-color: #5c068c;
+            animation: fillBar 0.5s ease-out forwards;
+        }
+
+        @keyframes fillBar {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
         .suggested-stops {
-            margin-top: 15px;
+            margin-top: 10px;
             max-height: 200px;
             overflow-y: auto;
             border: 1px solid #ddd;
@@ -177,7 +270,7 @@
         }
 
         .bus-selection {
-            margin: 20px auto;
+            margin: 15px auto;
             width: 90%;
             max-width: 500px;
             text-align: left;
@@ -186,7 +279,7 @@
         .bus-selection label {
             display: block;
             margin-bottom: 8px;
-            font-size: 18px;
+            font-size: 16px;
             color: #00453c;
             font-weight: bold;
         }
@@ -194,19 +287,20 @@
         .bus-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .bus-option {
             background-color: #f0f0f0;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 5px;
+            position: relative;
         }
 
         .bus-option.selected {
@@ -218,24 +312,31 @@
             border: 2px solid #5c068c;
         }
 
+        .bus-option.favorite.selected {
+            background-color: #5c068c;
+            color: white;
+            border-color: #5c068c;
+        }
+
         .bus-option.hidden {
             display: none;
         }
 
         .favorites-section {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #5c068c;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .favorites-section h3 {
             color: #5c068c;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 16px;
         }
 
         .price-display {
-            font-size: 18px;
-            margin: 20px 0;
+            font-size: 16px;
+            margin: 15px 0;
             color: #5c068c;
             font-weight: bold;
             display: none;
@@ -245,11 +346,11 @@
             background-color: #5c068c;
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 18px;
+            padding: 12px 25px;
+            font-size: 16px;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 30px;
+            margin-top: 20px;
             transition: background-color 0.3s;
         }
 
@@ -260,7 +361,7 @@
         .footer {
             display: flex;
             justify-content: space-around;
-            padding: 10px;
+            padding: 8px;
             border-top: 1px solid #ddd;
             background-color: white;
             position: fixed;
@@ -269,52 +370,119 @@
             right: 0;
             z-index: 100;
             display: none;
+            height: 60px;
         }
 
         .footer button {
             background: none;
             border: none;
-            font-size: 16px;
+            font-size: 14px;
             color: #585858;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 5px;
         }
 
         .footer button.active {
-            color: #00796b;
+            color: #006f5f;
         }
 
         .footer button img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
+            width: 30px;
+            height: 30px;
+            margin-bottom: 3px;
             border-radius: 50%;
             object-fit: cover;
         }
 
         .footer button:first-child img {
-            width: 48px;
-            height: 48px;
-            filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+            width: 35px;
+            height: 35px;
         }
 
         .footer button:first-child {
-            margin-top: -4px;
+            margin-top: 0;
         }
 
         .footer button:nth-child(2) img {
             filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
         }
 
-        .footer button:nth-child(3) img {
-            filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+        .footer button:nth-child(2).active img {
+            filter: brightness(0) saturate(100%) invert(22%) sepia(99%) saturate(2095%) hue-rotate(154deg) brightness(93%) contrast(101%);
+        }
+
+        .footer button.active img {
+            filter: brightness(0) saturate(100%) invert(22%) sepia(99%) saturate(2095%) hue-rotate(154deg) brightness(93%) contrast(101%);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .delete-confirmation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .delete-confirmation-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .delete-confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .delete-confirmation-btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-confirmation-btn.yes {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+        }
+
+        .delete-confirmation-btn.no {
+            background-color: #00796b;
+            color: white;
+            border: none;
+        }
+
+        .delete-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #5c068c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Lock Screen -->
     <div class="lock-screen" id="lockScreen">
         <h2>Enter Passcode</h2>
         <input type="password" class="passcode-input" id="passcodeInput" placeholder="Enter passcode">
@@ -322,7 +490,25 @@
         <div class="passcode-error" id="passcodeError">Incorrect passcode. Please try again.</div>
     </div>
 
-    <!-- Main App Content -->
+    <div class="update-alert" id="updateAlert">
+        <div class="update-alert-content" id="updateAlertContent">
+            <h2>🛠 Important Updates</h2>
+            <ul>
+                <li>Updated Stops: 190, 100, 109X, and 168</li>
+                <li>Route 109 is now operational</li>
+                <li>Favorites are now fully functional and can be selected/deselected</li>
+                <li>Visual feedback for route selection has been improved</li>
+                <li>The app now includes sound feedback on some buttons</li>
+                <li>New Settings menu added (with toggle and logout)</li>
+            </ul>
+            <div class="update-alert-checkbox">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Don't show this message again</label>
+            </div>
+            <button class="update-alert-button" onclick="acknowledgeUpdate()">Acknowledge</button>
+        </div>
+    </div>
+
     <div class="buy-container" id="appContent">
         <div class="header">
             <img src="Exit.png" alt="Exit" class="exit-arrow" onclick="window.history.back()">
@@ -336,19 +522,19 @@
         <div class="stop-selection" id="stop-selection">
             <div class="input-group">
                 <label for="origin">Origin</label>
-                <input type="text" id="origin" placeholder="Enter origin location" oninput="showSuggestedStops('origin', this.value)">
+                <input type="text" id="origin" placeholder="Enter origin location" oninput="showSuggestedStops('origin', this.value)" onblur="checkInputComplete('origin')" onkeyup="delayedInputComplete('origin', event)">
                 <div class="suggested-stops" id="origin-suggestions"></div>
             </div>
             
             <div class="input-group">
                 <label for="destination">Destination</label>
-                <input type="text" id="destination" placeholder="Enter destination location" oninput="showSuggestedStops('destination', this.value)">
+                <input type="text" id="destination" placeholder="Enter destination location" oninput="showSuggestedStops('destination', this.value)" onblur="checkInputComplete('destination')" onkeyup="delayedInputComplete('destination', event)">
                 <div class="suggested-stops" id="destination-suggestions"></div>
             </div>
-            
-            <div class="price-display" id="price-display">
-                Ticket Price: <span id="price-amount">€0.00</span>
-            </div>
+        </div>
+        
+        <div class="price-display" id="price-display">
+            Ticket Price: <span id="price-amount">€0.00</span>
         </div>
         
         <div class="bus-selection">
@@ -358,8 +544,6 @@
                 <div class="bus-options" id="favorite-bus-options"></div>
             </div>
             <div class="bus-options" id="bus-options">
-                <!-- Priority routes will be added first -->
-                <!-- "Other" option is always last -->
                 <div class="bus-option" onclick="selectBus('other')">Other</div>
             </div>
         </div>
@@ -368,53 +552,90 @@
     </div>
 
     <div class="footer" id="appFooter">
-        <button class="active" onclick="window.location.href='buy.html'">
+        <button onclick="window.location.href='buy.html'" class="active">
             <img src="EuroSign.png" alt="Euro Icon">
-            Buy
+            <span class="nav-label">Buy</span>
         </button>
         <button onclick="window.location.href='index.html'">
             <img src="TicketIcon.png" alt="Ticket Icon">
-            Tickets
+            <span class="nav-label">Tickets</span>
         </button>
         <button onclick="window.location.href='profile.html'">
             <img src="PersonIcon.png" alt="Profile Icon">
-            Profile
+            <span class="nav-label">Profile</span>
         </button>
     </div>
 
     <script>
-        // Passcode and Auto-Lock Functionality
         const PASSCODE = "T9C9M10";
         let autoLockTimer;
-        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000;
+        let currentBus = null;
+        let currentFilter = 'all';
+        let inputTimeout;
+        let originComplete = false;
+        let destinationComplete = false;
+
+        // Audio elements
+        const purchaseSound = new Audio('purchase.mp3');
+        purchaseSound.preload = 'auto';
+        const popSound = new Audio('pop.mp3');
+        popSound.preload = 'auto';
 
         function checkPasscode() {
             const input = document.getElementById('passcodeInput').value;
             const errorElement = document.getElementById('passcodeError');
             
             if (input === PASSCODE) {
-                // Correct passcode
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                document.getElementById('appFooter').style.display = 'flex';
+                const dontShowAgain = localStorage.getItem('dontShowUpdates');
                 
-                // Start session
-                sessionStorage.setItem('authenticated', 'true');
-                resetAutoLockTimer();
+                if (dontShowAgain !== 'true') {
+                    document.getElementById('updateAlert').style.display = 'flex';
+                } else {
+                    unlockApp();
+                }
             } else {
-                // Incorrect passcode
                 errorElement.style.display = 'block';
                 document.getElementById('passcodeInput').value = '';
             }
         }
 
+        function unlockApp() {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('appFooter').style.display = 'flex';
+            sessionStorage.setItem('authenticated', 'true');
+            resetAutoLockTimer();
+        }
+
+        function acknowledgeUpdate() {
+            const dontShowAgain = document.getElementById('dontShowAgain').checked;
+            if (dontShowAgain) {
+                localStorage.setItem('dontShowUpdates', 'true');
+            }
+            
+            if (localStorage.getItem('soundEnabled') !== 'false') {
+                popSound.play();
+            }
+            
+            document.getElementById('updateAlert').style.display = 'none';
+            unlockApp();
+        }
+
+        document.getElementById('updateAlert').addEventListener('click', function(e) {
+            if (e.target === this) {
+                const content = document.getElementById('updateAlertContent');
+                content.classList.add('shake');
+                setTimeout(() => {
+                    content.classList.remove('shake');
+                }, 500);
+            }
+        });
+
         function resetAutoLockTimer() {
-            // Clear existing timer
             if (autoLockTimer) {
                 clearTimeout(autoLockTimer);
             }
-            
-            // Set new timer
             autoLockTimer = setTimeout(lockApp, LOCK_TIMEOUT);
         }
 
@@ -427,7 +648,6 @@
             sessionStorage.removeItem('authenticated');
         }
 
-        // Check authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
             if (sessionStorage.getItem('authenticated') === 'true') {
                 document.getElementById('lockScreen').style.display = 'none';
@@ -440,708 +660,350 @@
                 document.getElementById('appFooter').style.display = 'none';
             }
 
-            // Set up event listeners for user activity
             document.addEventListener('click', resetAutoLockTimer);
             document.addEventListener('keypress', resetAutoLockTimer);
             document.addEventListener('scroll', resetAutoLockTimer);
             document.addEventListener('mousemove', resetAutoLockTimer);
 
-            // Load saved data
             const savedOrigin = localStorage.getItem('ticketOrigin');
             const savedDestination = localStorage.getItem('ticketDestination');
             
             if (savedOrigin) {
                 document.getElementById('origin').value = savedOrigin;
+                document.querySelector('#origin').parentElement.classList.add('input-focused');
             }
             if (savedDestination) {
                 document.getElementById('destination').value = savedDestination;
+                document.querySelector('#destination').parentElement.classList.add('input-focused');
             }
 
-            // Populate bus options with priority routes first
+            setActiveNavigation();
             populateBusOptions();
         });
 
-        // Priority routes (Dublin Commuter/Regional)
+        function setActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop();
+            const navButtons = document.querySelectorAll('.footer button');
+            
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+                const buttonPage = button.querySelector('.nav-label').textContent.toLowerCase();
+                if (buttonPage === 'buy' && currentPage === 'buy.html') {
+                    button.classList.add('active');
+                }
+            });
+        }
+
         const PRIORITY_ROUTES = ['100', '109', '109A', '109X', '115', 'NX'];
         
-        // Bus route data with all new routes
         const busRoutes = {
-            "100": [
-                "Drogheda Bus Station", "Monasterboice", "Collon", "Dunleer", "Castlebellingham", "Dundalk Bus Station"
-            ],
-            "100X": [
-                "Dublin Busáras", "Dublin Airport", "Drogheda", "Dundalk Bus Station"
-            ],
-            "101": [
-                "Dublin Busáras", "Dublin Airport", "Swords", "Balbriggan", "Drogheda Bus Station"
-            ],
-            "101X": [
-                "Dublin Busáras", "Dublin Airport", "Drogheda Bus Station"
-            ],
-            "103": [
-                "Dublin Busáras", "Blanchardstown SC", "Dunboyne", "Ratoath"
-            ],
-            "103X": [
-                "Dublin Busáras", "Blanchardstown SC", "Navan Bus Station"
-            ],
-            "105": [
-                "Blanchardstown SC", "Ashbourne", "Drogheda Bus Station"
-            ],
-            "105X": [
-                "Dublin Busáras", "Liffey Valley SC", "Fairyhouse Cross"
-            ],
-            "107": [
-                "Navan Bus Station", "Kingscourt"
-            ],
-            "108": [
-                "Kells Bus Station", "Bailieboro"
-            ],
-            "109": [
-                "Kells Ind Estate",
-                "Father Mccullen Park",
-                "Kells",
-                "Kilmainham",
-                "Bloomsbury Cross",
-                "Tankardstown",
-                "Mitchells Cross",
-                "Kells Road",
-                "Blackwater Retail Park",
-                "Navan",
-                "Abbey Road",
-                "Ardboyne Hotel",
-                "Kilcarn Bridge",
-                "St Columbans",
-                "Garlow Cross",
-                "Tara Cross",
-                "Lismullen",
-                "Old Ross Road",
-                "Grange Hall",
-                "Dunshaughlin",
-                "Dunshaughlin Ie",
-                "The Willows",
-                "Ballymurphy",
-                "Bush Lane",
-                "Rathbeggan",
-                "Porterstown Lane",
-                "Fairyhouse Cross",
-                "Msd Dunboyne",
-                "Bracetown Park",
-                "The Fairways Apartments",
-                "N3 Slip Road",
-                "Parkway Station",
-                "Navan Road",
-                "Phibsborough Po",
-                "Mater Hospital, Berkeley Road",
-                "O'Connell Street Upper",
-                "Dublin Busáras"
-            ],
-            "109A": [
-                "Busáras",
-                "Tower View",
-                "Abbey Road",
-                "Johnstown Centre",
-                "Boyne View",
-                "St Columbans",
-                "Garlow Cross",
-                "Dunshaughlin",
-                "Steeplechase Hill",
-                "Holy Trinity Church",
-                "Ballybin Roundabout",
-                "Ashbourne Centre",
-                "Ballybin Road",
-                "Saint John's Wood Court",
-                "Ashbourne Credit Union",
-                "Ashbourne",
-                "Bourne Avenue",
-                "Ashbourne Community College",
-                "Hickey's Lane",
-                "Ratoath",
-                "Dublin Airport",
-                "Ninemile Stone",
-                "DCU Collins Avenue"
-            ],
-            "109B": [
-                "Dublin Busáras", "Trim"
-            ],
-            "109X": [
-                "Dublin Busáras", "Cavan Bus Station"
-            ],
-            "111": [
-                "Dublin Busáras", "Athboy"
-            ],
-            "111A": [
-                "Cavan Bus Station", "Delvin"
-            ],
-            "111X": [
-                "Dublin Busáras", "Clonmellon"
-            ],
-            "115": [
-                "Dublin Busáras", "Mullingar Bus Station"
-            ],
-            "115C": [
-                "Kilcock", "Mullingar Bus Station"
-            ],
-            "131": [
-                "Bray DART Station", "Wicklow Town"
-            ],
-            "132": [
-                "Dublin Busáras", "Bunclody"
-            ],
-            "133": [
-                "Dublin Busáras", "Wicklow Town"
-            ],
-            "160": [
-                "Dundalk Bus Station", "Newry Bus Station"
-            ],
-            "161": [
-                "Dundalk Bus Station", "Newry Bus Station"
-            ],
-            "162": [
-                "Monaghan Bus Station", "Dundalk Bus Station"
-            ],
-            "167": [
-                "Dundalk Bus Station", "Mullingar Bus Station"
-            ],
-            "168": [
-                "Dundalk Bus Station", "Drogheda Bus Station"
-            ],
-            "170": [
-                "Cavan Bus Station", "Dundalk Bus Station"
-            ],
-            "175": [
-                "Monaghan Bus Station", "Cavan Bus Station"
-            ],
-            "175A": [
-                "Cavan Bus Station", "Monaghan Bus Station"
-            ],
-            "182": [
-                "Drogheda Bus Station", "Monaghan Bus Station"
-            ],
-            "187": [
-                "Kells Bus Station", "Virginia"
-            ],
-            "190": [
-                "Drogheda Bus Station", "Athlone Bus Station"
-            ],
-            "226": [
-                "Kinsale", "Cork Kent Station"
-            ],
-            "226X": [
-                "Kinsale", "MTU"
-            ],
-            "233": [
-                "Cork Bus Station", "Macroom"
-            ],
-            "235": [
-                "Cork Bus Station", "Rylane"
-            ],
-            "236": [
-                "Cork Bus Station", "Glengarriff"
-            ],
-            "237": [
-                "Cork Bus Station", "Goleen"
-            ],
-            "239": [
-                "Cork Bus Station", "Butlerstown"
-            ],
-            "240": [
-                "Cork Bus Station", "Ballycotton"
-            ],
-            "241": [
-                "Cork Bus Station", "Trabolgan"
-            ],
-            "243": [
-                "Cork Bus Station", "Doneraile"
-            ],
-            "245": [
-                "Cork Bus Station", "Clonmel"
-            ],
-            "245X": [
-                "Dublin Busáras", "Cork Bus Station"
-            ],
-            "257": [
-                "Macroom", "Killarney"
-            ],
-            "258": [
-                "Macroom", "Rylane"
-            ],
-            "259": [
-                "Macroom", "Renaniree"
-            ],
-            "260": [
-                "Cork Bus Station", "Ardmore"
-            ],
-            "261": [
-                "Cork Bus Station", "Ballinacurra"
-            ],
-            "270": [
-                "Skibbereen", "Killarney"
-            ],
-            "271": [
-                "Tralee", "Killarney"
-            ],
-            "272": [
-                "Tralee", "Ballybunion"
-            ],
-            "275": [
-                "Tralee", "Dingle"
-            ],
-            "279": [
-                "Tralee", "Killorglin"
-            ],
-            "279A": [
-                "Killarney", "Waterville"
-            ],
-            "284": [
-                "Tralee", "Killarney"
-            ],
-            "314": [
-                "Limerick Bus Station", "Ballybunion"
-            ],
-            "316": [
-                "Shannon Airport", "Sixmilebridge"
-            ],
-            "317": [
-                "Limerick Bus Station", "Ennis"
-            ],
-            "317A": [
-                "Limerick Bus Station", "Ennis"
-            ],
-            "320": [
-                "Limerick Bus Station", "Charleville"
-            ],
-            "321": [
-                "Limerick Bus Station", "Newcastle West"
-            ],
-            "323": [
-                "Limerick Bus Station", "Nenagh"
-            ],
-            "323X": [
-                "Limerick Bus Station", "Birr"
-            ],
-            "328": [
-                "Limerick Bus Station", "Mitchelstown"
-            ],
-            "329": [
-                "Limerick Bus Station", "Kilfinane"
-            ],
-            "330": [
-                "Ennis", "Shannon Airport"
-            ],
-            "330X": [
-                "Limerick Bus Station", "Ennis"
-            ],
-            "332": [
-                "Limerick Bus Station", "Cashel"
-            ],
-            "333": [
-                "Ennis", "Kilkee"
-            ],
-            "336": [
-                "Ennis", "Doonbeg"
-            ],
-            "343": [
-                "Limerick Bus Station", "Shannon"
-            ],
-            "345": [
-                "Limerick Bus Station", "Scariff"
-            ],
-            "347": [
-                "Limerick Bus Station", "Tipperary"
-            ],
-            "350": [
-                "Galway Bus Station", "Ennis"
-            ],
-            "354": [
-                "Carrick-On-Suir", "Dunmore East"
-            ],
-            "355": [
-                "Waterford Bus Station", "Cahir"
-            ],
-            "362": [
-                "Waterford Bus Station", "Dungarvan"
-            ],
-            "365": [
-                "Waterford Bus Station", "Thomastown"
-            ],
-            "366": [
-                "Lismore", "Waterford Bus Station"
-            ],
-            "370": [
-                "Waterford Bus Station", "Rosslare"
-            ],
-            "371": [
-                "New Ross", "Wexford"
-            ],
-            "372": [
-                "New Ross", "Wexford"
-            ],
-            "373": [
-                "New Ross", "Wexford"
-            ],
-            "374": [
-                "New Ross", "Kilkenny"
-            ],
-            "375": [
-                "New Ross", "Enniscorthy"
-            ],
-            "377": [
-                "Wexford", "Enniscorthy"
-            ],
-            "378": [
-                "Wexford", "Churchtown"
-            ],
-            "379": [
-                "Wexford", "Gorey"
-            ],
-            "380": [
-                "Wexford", "Crossabeg"
-            ],
-            "381": [
-                "Wexford", "Blackhall"
-            ],
-            "382": [
-                "Wexford", "Adamstown"
-            ],
-            "383": [
-                "Wexford", "Additional Stop"
-            ],
-            "385": [
-                "Wexford", "Rosslare Europort"
-            ],
-            "417": [
-                "Galway Bus Station", "Ballinastack"
-            ],
-            "419": [
-                "Galway Bus Station", "Clifden"
-            ],
-            "420": [
-                "Ballina Bus Station", "Castlebar Bus Station"
-            ],
-            "421": [
-                "Swinford", "Claremorris"
-            ],
-            "422": [
-                "Castlebar Bus Station", "Headford"
-            ],
-            "423": [
-                "Clifden", "Westport"
-            ],
-            "424": [
-                "Galway Bus Station", "Lettermullen"
-            ],
-            "425": [
-                "Galway Bus Station", "Longford"
-            ],
-            "425A": [
-                "Galway Bus Station", "Mountbellew"
-            ],
-            "429": [
-                "Galway Bus Station", "Castlerea"
-            ],
-            "434": [
-                "Galway Bus Station", "Gort"
-            ],
-            "440": [
-                "Athlone Bus Station", "Westport"
-            ],
-            "442": [
-                "Charlestown", "Roundfort"
-            ],
-            "444": [
-                "Ballina Bus Station", "Dromore West"
-            ],
-            "445": [
-                "Ballina Bus Station", "Ballycastle"
-            ],
-            "446": [
-                "Ballina Bus Station", "Blacksod"
-            ],
-            "447": [
-                "Finea", "Mullingar"
-            ],
-            "448": [
-                "Shandonagh", "Mullingar"
-            ],
-            "450": [
-                "Dooagh", "Louisburgh"
-            ],
-            "451": [
-                "Ballina Bus Station", "Longford"
-            ],
-            "455": [
-                "Ballina Bus Station", "Crossmolina"
-            ],
-            "456": [
-                "Galway Bus Station", "Castlebar"
-            ],
-            "457": [
-                "Castlerea", "Roscommon"
-            ],
-            "458": [
-                "Ballina Bus Station", "Enniskillen"
-            ],
-            "461": [
-                "Athlone Bus Station", "Roscommon"
-            ],
-            "462": [
-                "Sligo Bus Station", "Carrigallen"
-            ],
-            "463": [
-                "Carrigallen", "Longford"
-            ],
-            "464": [
-                "Carrigallen", "Enniskillen"
-            ],
-            "465": [
-                "Carrigallen", "Cavan"
-            ],
-            "466": [
-                "Athlone Bus Station", "Cavan"
-            ],
-            "467": [
-                "Longford", "Lanesborough"
-            ],
-            "470": [
-                "Sligo Bus Station", "Glenfarne"
-            ],
-            "471": [
-                "Sligo Bus Station", "Riverstown"
-            ],
-            "480": [
-                "Sligo Bus Station", "Derry"
-            ],
-            "483": [
-                "Ballyshannon", "Sligo Bus Station"
-            ],
-            "487": [
-                "Strabane", "Letterkenny"
-            ],
-            "489": [
-                "Letterkenny", "Strabane"
-            ],
-            "490": [
-                "Donegal", "Glencolumbcille"
-            ],
-            "491": [
-                "Letterkenny", "Ballybofey"
-            ],
-            "492": [
-                "Donegal", "Dungloe"
-            ],
-            "494": [
-                "Strabane", "Ballybofey"
-            ],
-            "65": [
-                "Galway Bus Station", "Cavan"
-            ],
-            "70": [
-                "Athlone Bus Station", "Navan"
-            ],
-            "72": [
-                "Limerick Bus Station", "Athlone"
-            ],
-            "73": [
-                "Waterford Bus Station", "Athlone"
-            ],
-            "NX": [
-                "Abbey Road",
-                "Ratholdren Road",
-                "Leisure Link",
-                "Russell Court",
-                "Navan Park And Ride",
-                "Navan",
-                "Limekilnhill",
-                "Meath County Council",
-                "Johnstown Centre",
-                "Boyne View",
-                "St Columbans",
-                "Garlow Cross",
-                "Blanchardstown",
-                "N3 Slip Road",
-                "North Circular Road",
-                "Broadstone",
-                "O'Connell Street Upper",
-                "Irish Life Mall",
-                "Westland Row Church",
-                "Merrion Square, Holles Street",
-                "Wilton Terrace"
-            ]
+            "100": ["Dundalk Bus Station", "Stapleton Place", "Louth Hospital", "Dundalk It", "Seafield Road", "Greengates", "Castlebellingham", "Saint Oliver's Park", "Saint Mary's Villas", "Mullins Cross", "Dunleer", "Mullary", "Tinure", "Naomh Mairtin Gfc", "Cockle Road Cross", "Tullyeskar", "Drogheda Hospital", "Drogheda Bus Station"],
+            "100X": ["Dublin Busáras", "Dublin Airport", "Drogheda", "Dundalk Bus Station"],
+            "101": ["Dublin Busáras", "Dublin Airport", "Swords", "Balbriggan", "Drogheda Bus Station"],
+            "101X": ["Dublin Busáras", "Dublin Airport", "Drogheda Bus Station"],
+            "103": ["Dublin Busáras", "Blanchardstown SC", "Dunboyne", "Ratoath"],
+            "103X": ["Dublin Busáras", "Blanchardstown SC", "Navan Bus Station"],
+            "105": ["Blanchardstown SC", "Ashbourne", "Drogheda Bus Station"],
+            "105X": ["Dublin Busáras", "Liffey Valley SC", "Fairyhouse Cross"],
+            "107": ["Navan Bus Station", "Kingscourt"],
+            "108": ["Kells Bus Station", "Bailieboro"],
+            "109": ["Kells Ind Estate", "Father Mccullen Park", "Kells", "Kilmainham", "Bloomsbury Cross", "Tankardstown", "Mitchells Cross", "Kells Road", "Blackwater Retail Park", "Navan", "Abbey Road", "Ardboyne Hotel", "Kilcarn Bridge", "St Columbans", "Garlow Cross", "Tara Cross", "Lismullen", "Old Ross Road", "Grange Hall", "Dunshaughlin", "Dunshaughlin Ie", "The Willows", "Ballymurphy", "Bush Lane", "Rathbeggan", "Porterstown Lane", "Fairyhouse Cross", "Msd Dunboyne", "Bracetown Park", "The Fairways Apartments", "N3 Slip Road", "Parkway Station", "Navan Road", "Phibsborough Po", "Mater Hospital, Berkeley Road", "O'Connell Street Upper", "Irish Life Mall", "Westland Row Church", "Merrion Square, Holles Street", "Wilton Terrace"],
+            "109A": ["Busáras", "Tower View", "Abbey Road", "Johnstown Centre", "Boyne View", "St Columbans", "Garlow Cross", "Dunshaughlin", "Steeplechase Hill", "Holy Trinity Church", "Ballybin Roundabout", "Ashbourne Centre", "Ballybin Road", "Saint John's Wood Court", "Ashbourne Credit Union", "Ashbourne", "Bourne Avenue", "Ashbourne Community College", "Hickey's Lane", "Ratoath", "Dublin Airport", "Ninemile Stone", "DCU Collins Avenue"],
+            "109B": ["Dublin Busáras", "Trim"],
+            "109X": ["Dublin Busáras", "Innisfallen Parade", "Binns Bridge", "Finglas Road", "Wellmount Road", "St Margaret's Road", "Blanchardstown Shopping Centre", "Springfield Glen", "Kells Road", "Kells", "Cavan Road", "Father Mccullen Pk", "Kells Business Park", "St Ciaran's Church", "Carnaross North", "Whitegate Cross", "Maghera Cross Roads", "Lough Ramor", "Virginia", "Lisgrea", "Billis", "New Inn", "Knocknagillagh", "Lavey", "Kilmore Hotel", "Training Campus", "Crystal Hotel", "Breffni Retail Park", "Cavan Bus Station"],
+            "111": ["Dublin Busáras", "Athboy"],
+            "111A": ["Cavan Bus Station", "Delvin"],
+            "111X": ["Dublin Busáras", "Clonmellon"],
+            "115": ["Dublin Busáras", "Mullingar Bus Station"],
+            "115C": ["Kilcock", "Mullingar Bus Station"],
+            "131": ["Bray DART Station", "Wicklow Town"],
+            "132": ["Dublin Busáras", "Bunclody"],
+            "133": ["Dublin Busáras", "Wicklow Town"],
+            "160": ["Dundalk Bus Station", "Newry Bus Station"],
+            "161": ["Dundalk Bus Station", "Newry Bus Station"],
+            "162": ["Monaghan Bus Station", "Dundalk Bus Station"],
+            "167": ["Dundalk Bus Station", "Mullingar Bus Station"],
+            "168": ["Dundalk Bus Station", "Stapleton Place", "Louth Hospital", "Dundalk It", "Seafield Road", "Greengates", "Carrolls Cross", "Dromiskin Cross", "Dromiskin", "Castlebellingham", "Annagassan", "Grangebellew", "Hackets Cross", "Clogher Village", "Termonfeckin", "Baltray", "Saint Joseph's Secondary School", "Scarlet Street", "St Joseph's Cbs", "Bóthar Brugha", "Drogheda Hospital", "Drogheda Bus Station"],
+            "170": ["Cavan Bus Station", "Dundalk Bus Station"],
+            "175": ["Monaghan Bus Station", "Cavan Bus Station"],
+            "175A": ["Cavan Bus Station", "Monaghan Bus Station"],
+            "182": ["Drogheda Bus Station", "Monaghan Bus Station"],
+            "187": ["Kells Bus Station", "Virginia"],
+            "190": ["Drogheda Bus Station", "Georges Street", "Bóthar Brugha", "Drogheda Hospital", "M1 Retail Park", "Slane", "Navan", "Railway Street", "Beaufort College", "Connells Cross", "Trim Retail Park", "Trim Castle", "Ballivor Church", "Raharney", "Killucan", "Ardmore Road", "Petitswood", "Prospect", "Castle Street", "Moate", "Tus East Campus", "Athlone Station"],
+            "226": ["Kinsale", "Cork Kent Station"],
+            "226X": ["Kinsale", "MTU"],
+            "233": ["Cork Bus Station", "Macroom"],
+            "235": ["Cork Bus Station", "Rylane"],
+            "236": ["Cork Bus Station", "Glengarriff"],
+            "237": ["Cork Bus Station", "Goleen"],
+            "239": ["Cork Bus Station", "Butlerstown"],
+            "240": ["Cork Bus Station", "Ballycotton"],
+            "241": ["Cork Bus Station", "Trabolgan"],
+            "243": ["Cork Bus Station", "Doneraile"],
+            "245": ["Cork Bus Station", "Clonmel"],
+            "245X": ["Dublin Busáras", "Cork Bus Station"],
+            "257": ["Macroom", "Killarney"],
+            "258": ["Macroom", "Rylane"],
+            "259": ["Macroom", "Renaniree"],
+            "260": ["Cork Bus Station", "Ardmore"],
+            "261": ["Cork Bus Station", "Ballinacurra"],
+            "270": ["Skibbereen", "Killarney"],
+            "271": ["Tralee", "Killarney"],
+            "272": ["Tralee", "Ballybunion"],
+            "275": ["Tralee", "Dingle"],
+            "279": ["Tralee", "Killorglin"],
+            "279A": ["Killarney", "Waterville"],
+            "284": ["Tralee", "Killarney"],
+            "314": ["Limerick Bus Station", "Ballybunion"],
+            "316": ["Shannon Airport", "Sixmilebridge"],
+            "317": ["Limerick Bus Station", "Ennis"],
+            "317A": ["Limerick Bus Station", "Ennis"],
+            "320": ["Limerick Bus Station", "Charleville"],
+            "321": ["Limerick Bus Station", "Newcastle West"],
+            "323": ["Limerick Bus Station", "Nenagh"],
+            "323X": ["Limerick Bus Station", "Birr"],
+            "328": ["Limerick Bus Station", "Mitchelstown"],
+            "329": ["Limerick Bus Station", "Kilfinane"],
+            "330": ["Ennis", "Shannon Airport"],
+            "330X": ["Limerick Bus Station", "Ennis"],
+            "332": ["Limerick Bus Station", "Cashel"],
+            "333": ["Ennis", "Kilkee"],
+            "336": ["Ennis", "Doonbeg"],
+            "343": ["Limerick Bus Station", "Shannon"],
+            "345": ["Limerick Bus Station", "Scariff"],
+            "347": ["Limerick Bus Station", "Tipperary"],
+            "350": ["Galway Bus Station", "Ennis"],
+            "354": ["Carrick-On-Suir", "Dunmore East"],
+            "355": ["Waterford Bus Station", "Cahir"],
+            "362": ["Waterford Bus Station", "Dungarvan"],
+            "365": ["Waterford Bus Station", "Thomastown"],
+            "366": ["Lismore", "Waterford Bus Station"],
+            "370": ["Waterford Bus Station", "Rosslare"],
+            "371": ["New Ross", "Wexford"],
+            "372": ["New Ross", "Wexford"],
+            "373": ["New Ross", "Wexford"],
+            "374": ["New Ross", "Kilkenny"],
+            "375": ["New Ross", "Enniscorthy"],
+            "377": ["Wexford", "Enniscorthy"],
+            "378": ["Wexford", "Churchtown"],
+            "379": ["Wexford", "Gorey"],
+            "380": ["Wexford", "Crossabeg"],
+            "381": ["Wexford", "Blackhall"],
+            "382": ["Wexford", "Adamstown"],
+            "383": ["Wexford", "Additional Stop"],
+            "385": ["Wexford", "Rosslare Europort"],
+            "417": ["Galway Bus Station", "Ballinastack"],
+            "419": ["Galway Bus Station", "Clifden"],
+            "420": ["Ballina Bus Station", "Castlebar Bus Station"],
+            "421": ["Swinford", "Claremorris"],
+            "422": ["Castlebar Bus Station", "Headford"],
+            "423": ["Clifden", "Westport"],
+            "424": ["Galway Bus Station", "Lettermullen"],
+            "425": ["Galway Bus Station", "Longford"],
+            "425A": ["Galway Bus Station", "Mountbellew"],
+            "429": ["Galway Bus Station", "Castlerea"],
+            "434": ["Galway Bus Station", "Gort"],
+            "440": ["Athlone Bus Station", "Westport"],
+            "442": ["Charlestown", "Roundfort"],
+            "444": ["Ballina Bus Station", "Dromore West"],
+            "445": ["Ballina Bus Station", "Ballycastle"],
+            "446": ["Ballina Bus Station", "Blacksod"],
+            "447": ["Finea", "Mullingar"],
+            "448": ["Shandonagh", "Mullingar"],
+            "450": ["Dooagh", "Louisburgh"],
+            "451": ["Ballina Bus Station", "Longford"],
+            "455": ["Ballina Bus Station", "Crossmolina"],
+            "456": ["Galway Bus Station", "Castlebar"],
+            "457": ["Castlerea", "Roscommon"],
+            "458": ["Ballina Bus Station", "Enniskillen"],
+            "461": ["Athlone Bus Station", "Roscommon"],
+            "462": ["Sligo Bus Station", "Carrigallen"],
+            "463": ["Carrigallen", "Longford"],
+            "464": ["Carrigallen", "Enniskillen"],
+            "465": ["Carrigallen", "Cavan"],
+            "466": ["Athlone Bus Station", "Cavan"],
+            "467": ["Longford", "Lanesborough"],
+            "470": ["Sligo Bus Station", "Glenfarne"],
+            "471": ["Sligo Bus Station", "Riverstown"],
+            "480": ["Sligo Bus Station", "Derry"],
+            "483": ["Ballyshannon", "Sligo Bus Station"],
+            "487": ["Strabane", "Letterkenny"],
+            "489": ["Letterkenny", "Strabane"],
+            "490": ["Donegal", "Glencolumbcille"],
+            "491": ["Letterkenny", "Ballybofey"],
+            "492": ["Donegal", "Dungloe"],
+            "494": ["Strabane", "Ballybofey"],
+            "65": ["Galway Bus Station", "Cavan"],
+            "70": ["Athlone Bus Station", "Navan"],
+            "72": ["Limerick Bus Station", "Athlone"],
+            "73": ["Waterford Bus Station", "Athlone"],
+            "NX": ["Abbey Road", "Ratholdren Road", "Leisure Link", "Russell Court", "Navan Park And Ride", "Navan", "Limekilnhill", "Meath County Council", "Johnstown Centre", "Boyne View", "St Columbans", "Garlow Cross", "Blanchardstown", "N3 Slip Road", "North Circular Road", "Broadstone", "O'Connell Street Upper", "Irish Life Mall", "Westland Row Church", "Merrion Square, Holles Street", "Wilton Terrace"]
         };
 
-        // Ticket prices for Young Adult/Student fares
         const ticketPrices = {
-            "100": { "shortFare": 0.75, "standardFare": 1.00 },
-            "100X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "101": { "shortFare": 0.75, "standardFare": 1.00 },
-            "101X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "103": { "shortFare": 0.75, "standardFare": 1.00 },
-            "103X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "105": { "shortFare": 0.75, "standardFare": 1.00 },
-            "105X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "107": { "shortFare": 0.75, "standardFare": 1.00 },
-            "108": { "shortFare": 0.75, "standardFare": 1.00 },
-            "109": { "shortFare": 0.75, "standardFare": 1.00 },
-            "109A": { "shortFare": 0.75, "standardFare": 1.00 },
-            "109B": { "shortFare": 0.75, "standardFare": 1.00 },
-            "109X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "111": { "shortFare": 0.75, "standardFare": 1.00 },
-            "111A": { "shortFare": 0.75, "standardFare": 1.00 },
-            "111X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "115": { "shortFare": 0.75, "standardFare": 1.00 },
-            "115C": { "shortFare": 0.75, "standardFare": 1.00 },
-            "131": { "shortFare": 0.75, "standardFare": 1.00 },
-            "132": { "shortFare": 0.75, "standardFare": 1.00 },
-            "133": { "shortFare": 0.75, "standardFare": 1.00 },
-            "160": { "shortFare": 0.75, "standardFare": 1.00 },
-            "161": { "shortFare": 0.75, "standardFare": 1.00 },
-            "162": { "shortFare": 0.75, "standardFare": 1.00 },
-            "167": { "shortFare": 0.75, "standardFare": 1.00 },
-            "168": { "shortFare": 0.75, "standardFare": 1.00 },
-            "170": { "shortFare": 0.75, "standardFare": 1.00 },
-            "175": { "shortFare": 0.75, "standardFare": 1.00 },
-            "175A": { "shortFare": 0.75, "standardFare": 1.00 },
-            "182": { "shortFare": 0.75, "standardFare": 1.00 },
-            "187": { "shortFare": 0.75, "standardFare": 1.00 },
-            "190": { "shortFare": 0.75, "standardFare": 1.00 },
-            "226": { "shortFare": 0.75, "standardFare": 1.00 },
-            "226X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "233": { "shortFare": 0.75, "standardFare": 1.00 },
-            "235": { "shortFare": 0.75, "standardFare": 1.00 },
-            "236": { "shortFare": 0.75, "standardFare": 1.00 },
-            "237": { "shortFare": 0.75, "standardFare": 1.00 },
-            "239": { "shortFare": 0.75, "standardFare": 1.00 },
-            "240": { "shortFare": 0.75, "standardFare": 1.00 },
-            "241": { "shortFare": 0.75, "standardFare": 1.00 },
-            "243": { "shortFare": 0.75, "standardFare": 1.00 },
-            "245": { "shortFare": 0.75, "standardFare": 1.00 },
-            "245X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "257": { "shortFare": 0.75, "standardFare": 1.00 },
-            "258": { "shortFare": 0.75, "standardFare": 1.00 },
-            "259": { "shortFare": 0.75, "standardFare": 1.00 },
-            "260": { "shortFare": 0.75, "standardFare": 1.00 },
-            "261": { "shortFare": 0.75, "standardFare": 1.00 },
-            "270": { "shortFare": 0.75, "standardFare": 1.00 },
-            "271": { "shortFare": 0.75, "standardFare": 1.00 },
-            "272": { "shortFare": 0.75, "standardFare": 1.00 },
-            "275": { "shortFare": 0.75, "standardFare": 1.00 },
-            "279": { "shortFare": 0.75, "standardFare": 1.00 },
-            "279A": { "shortFare": 0.75, "standardFare": 1.00 },
-            "284": { "shortFare": 0.75, "standardFare": 1.00 },
-            "314": { "shortFare": 0.75, "standardFare": 1.00 },
-            "316": { "shortFare": 0.75, "standardFare": 1.00 },
-            "317": { "shortFare": 0.75, "standardFare": 1.00 },
-            "317A": { "shortFare": 0.75, "standardFare": 1.00 },
-            "320": { "shortFare": 0.75, "standardFare": 1.00 },
-            "321": { "shortFare": 0.75, "standardFare": 1.00 },
-            "323": { "shortFare": 0.75, "standardFare": 1.00 },
-            "323X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "328": { "shortFare": 0.75, "standardFare": 1.00 },
-            "329": { "shortFare": 0.75, "standardFare": 1.00 },
-            "330": { "shortFare": 0.75, "standardFare": 1.00 },
-            "330X": { "shortFare": 0.75, "standardFare": 1.00 },
-            "332": { "shortFare": 0.75, "standardFare": 1.00 },
-            "333": { "shortFare": 0.75, "standardFare": 1.00 },
-            "336": { "shortFare": 0.75, "standardFare": 1.00 },
-            "343": { "shortFare": 0.75, "standardFare": 1.00 },
-            "345": { "shortFare": 0.75, "standardFare": 1.00 },
-            "347": { "shortFare": 0.75, "standardFare": 1.00 },
-            "350": { "shortFare": 0.75, "standardFare": 1.00 },
-            "354": { "shortFare": 0.75, "standardFare": 1.00 },
-            "355": { "shortFare": 0.75, "standardFare": 1.00 },
-            "362": { "shortFare": 0.75, "standardFare": 1.00 },
-            "365": { "shortFare": 0.75, "standardFare": 1.00 },
-            "366": { "shortFare": 0.75, "standardFare": 1.00 },
-            "370": { "shortFare": 0.75, "standardFare": 1.00 },
-            "371": { "shortFare": 0.75, "standardFare": 1.00 },
-            "372": { "shortFare": 0.75, "standardFare": 1.00 },
-            "373": { "shortFare": 0.75, "standardFare": 1.00 },
-            "374": { "shortFare": 0.75, "standardFare": 1.00 },
-            "375": { "shortFare": 0.75, "standardFare": 1.00 },
-            "377": { "shortFare": 0.75, "standardFare": 1.00 },
-            "378": { "shortFare": 0.75, "standardFare": 1.00 },
-            "379": { "shortFare": 0.75, "standardFare": 1.00 },
-            "380": { "shortFare": 0.75, "standardFare": 1.00 },
-            "381": { "shortFare": 0.75, "standardFare": 1.00 },
-            "382": { "shortFare": 0.75, "standardFare": 1.00 },
-            "383": { "shortFare": 0.75, "standardFare": 1.00 },
-            "385": { "shortFare": 0.75, "standardFare": 1.00 },
-            "417": { "shortFare": 0.75, "standardFare": 1.00 },
-            "419": { "shortFare": 0.75, "standardFare": 1.00 },
-            "420": { "shortFare": 0.75, "standardFare": 1.00 },
-            "421": { "shortFare": 0.75, "standardFare": 1.00 },
-            "422": { "shortFare": 0.75, "standardFare": 1.00 },
-            "423": { "shortFare": 0.75, "standardFare": 1.00 },
-            "424": { "shortFare": 0.75, "standardFare": 1.00 },
-            "425": { "shortFare": 0.75, "standardFare": 1.00 },
-            "425A": { "shortFare": 0.75, "standardFare": 1.00 },
-            "429": { "shortFare": 0.75, "standardFare": 1.00 },
-            "434": { "shortFare": 0.75, "standardFare": 1.00 },
-            "440": { "shortFare": 0.75, "standardFare": 1.00 },
-            "442": { "shortFare": 0.75, "standardFare": 1.00 },
-            "444": { "shortFare": 0.75, "standardFare": 1.00 },
-            "445": { "shortFare": 0.75, "standardFare": 1.00 },
-            "446": { "shortFare": 0.75, "standardFare": 1.00 },
-            "447": { "shortFare": 0.75, "standardFare": 1.00 },
-            "448": { "shortFare": 0.75, "standardFare": 1.00 },
-            "450": { "shortFare": 0.75, "standardFare": 1.00 },
-            "451": { "shortFare": 0.75, "standardFare": 1.00 },
-            "455": { "shortFare": 0.75, "standardFare": 1.00 },
-            "456": { "shortFare": 0.75, "standardFare": 1.00 },
-            "457": { "shortFare": 0.75, "standardFare": 1.00 },
-            "458": { "shortFare": 0.75, "standardFare": 1.00 },
-            "461": { "shortFare": 0.75, "standardFare": 1.00 },
-            "462": { "shortFare": 0.75, "standardFare": 1.00 },
-            "463": { "shortFare": 0.75, "standardFare": 1.00 },
-            "464": { "shortFare": 0.75, "standardFare": 1.00 },
-            "465": { "shortFare": 0.75, "standardFare": 1.00 },
-            "466": { "shortFare": 0.75, "standardFare": 1.00 },
-            "467": { "shortFare": 0.75, "standardFare": 1.00 },
-            "470": { "shortFare": 0.75, "standardFare": 1.00 },
-            "471": { "shortFare": 0.75, "standardFare": 1.00 },
-            "480": { "shortFare": 0.75, "standardFare": 1.00 },
-            "483": { "shortFare": 0.75, "standardFare": 1.00 },
-            "487": { "shortFare": 0.75, "standardFare": 1.00 },
-            "489": { "shortFare": 0.75, "standardFare": 1.00 },
-            "490": { "shortFare": 0.75, "standardFare": 1.00 },
-            "491": { "shortFare": 0.75, "standardFare": 1.00 },
-            "492": { "shortFare": 0.75, "standardFare": 1.00 },
-            "494": { "shortFare": 0.75, "standardFare": 1.00 },
-            "65": { "shortFare": 0.75, "standardFare": 1.00 },
-            "70": { "shortFare": 0.75, "standardFare": 1.00 },
-            "72": { "shortFare": 0.75, "standardFare": 1.00 },
-            "73": { "shortFare": 0.75, "standardFare": 1.00 },
-            "NX": { "shortFare": 0.75, "standardFare": 1.00 },
-            "other": { "defaultFare": 1.00 }
+            "100": { "shortFare": 1.82, "standardFare": 2.80 },
+            "100X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "101": { "shortFare": 1.82, "standardFare": 2.80 },
+            "101X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "103": { "shortFare": 1.82, "standardFare": 2.80 },
+            "103X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "105": { "shortFare": 1.82, "standardFare": 2.80 },
+            "105X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "107": { "shortFare": 1.82, "standardFare": 2.80 },
+            "108": { "shortFare": 1.82, "standardFare": 2.80 },
+            "109": { "shortFare": 1.82, "standardFare": 2.80 },
+            "109A": { "shortFare": 1.82, "standardFare": 2.80 },
+            "109B": { "shortFare": 1.82, "standardFare": 2.80 },
+            "109X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "111": { "shortFare": 1.82, "standardFare": 2.80 },
+            "111A": { "shortFare": 1.82, "standardFare": 2.80 },
+            "111X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "115": { "shortFare": 1.82, "standardFare": 2.80 },
+            "115C": { "shortFare": 1.82, "standardFare": 2.80 },
+            "131": { "shortFare": 1.82, "standardFare": 2.80 },
+            "132": { "shortFare": 1.82, "standardFare": 2.80 },
+            "133": { "shortFare": 1.82, "standardFare": 2.80 },
+            "160": { "shortFare": 1.82, "standardFare": 2.80 },
+            "161": { "shortFare": 1.82, "standardFare": 2.80 },
+            "162": { "shortFare": 1.82, "standardFare": 2.80 },
+            "167": { "shortFare": 1.82, "standardFare": 2.80 },
+            "168": { "shortFare": 1.82, "standardFare": 2.80 },
+            "170": { "shortFare": 1.82, "standardFare": 2.80 },
+            "175": { "shortFare": 1.82, "standardFare": 2.80 },
+            "175A": { "shortFare": 1.82, "standardFare": 2.80 },
+            "182": { "shortFare": 1.82, "standardFare": 2.80 },
+            "187": { "shortFare": 1.82, "standardFare": 2.80 },
+            "190": { "shortFare": 1.82, "standardFare": 2.80 },
+            "226": { "shortFare": 1.82, "standardFare": 2.80 },
+            "226X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "233": { "shortFare": 1.82, "standardFare": 2.80 },
+            "235": { "shortFare": 1.82, "standardFare": 2.80 },
+            "236": { "shortFare": 1.82, "standardFare": 2.80 },
+            "237": { "shortFare": 1.82, "standardFare": 2.80 },
+            "239": { "shortFare": 1.82, "standardFare": 2.80 },
+            "240": { "shortFare": 1.82, "standardFare": 2.80 },
+            "241": { "shortFare": 1.82, "standardFare": 2.80 },
+            "243": { "shortFare": 1.82, "standardFare": 2.80 },
+            "245": { "shortFare": 1.82, "standardFare": 2.80 },
+            "245X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "257": { "shortFare": 1.82, "standardFare": 2.80 },
+            "258": { "shortFare": 1.82, "standardFare": 2.80 },
+            "259": { "shortFare": 1.82, "standardFare": 2.80 },
+            "260": { "shortFare": 1.82, "standardFare": 2.80 },
+            "261": { "shortFare": 1.82, "standardFare": 2.80 },
+            "270": { "shortFare": 1.82, "standardFare": 2.80 },
+            "271": { "shortFare": 1.82, "standardFare": 2.80 },
+            "272": { "shortFare": 1.82, "standardFare": 2.80 },
+            "275": { "shortFare": 1.82, "standardFare": 2.80 },
+            "279": { "shortFare": 1.82, "standardFare": 2.80 },
+            "279A": { "shortFare": 1.82, "standardFare": 2.80 },
+            "284": { "shortFare": 1.82, "standardFare": 2.80 },
+            "314": { "shortFare": 1.82, "standardFare": 2.80 },
+            "316": { "shortFare": 1.82, "standardFare": 2.80 },
+            "317": { "shortFare": 1.82, "standardFare": 2.80 },
+            "317A": { "shortFare": 1.82, "standardFare": 2.80 },
+            "320": { "shortFare": 1.82, "standardFare": 2.80 },
+            "321": { "shortFare": 1.82, "standardFare": 2.80 },
+            "323": { "shortFare": 1.82, "standardFare": 2.80 },
+            "323X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "328": { "shortFare": 1.82, "standardFare": 2.80 },
+            "329": { "shortFare": 1.82, "standardFare": 2.80 },
+            "330": { "shortFare": 1.82, "standardFare": 2.80 },
+            "330X": { "shortFare": 1.82, "standardFare": 2.80 },
+            "332": { "shortFare": 1.82, "standardFare": 2.80 },
+            "333": { "shortFare": 1.82, "standardFare": 2.80 },
+            "336": { "shortFare": 1.82, "standardFare": 2.80 },
+            "343": { "shortFare": 1.82, "standardFare": 2.80 },
+            "345": { "shortFare": 1.82, "standardFare": 2.80 },
+            "347": { "shortFare": 1.82, "standardFare": 2.80 },
+            "350": { "shortFare": 1.82, "standardFare": 2.80 },
+            "354": { "shortFare": 1.82, "standardFare": 2.80 },
+            "355": { "shortFare": 1.82, "standardFare": 2.80 },
+            "362": { "shortFare": 1.82, "standardFare": 2.80 },
+            "365": { "shortFare": 1.82, "standardFare": 2.80 },
+            "366": { "shortFare": 1.82, "standardFare": 2.80 },
+            "370": { "shortFare": 1.82, "standardFare": 2.80 },
+            "371": { "shortFare": 1.82, "standardFare": 2.80 },
+            "372": { "shortFare": 1.82, "standardFare": 2.80 },
+            "373": { "shortFare": 1.82, "standardFare": 2.80 },
+            "374": { "shortFare": 1.82, "standardFare": 2.80 },
+            "375": { "shortFare": 1.82, "standardFare": 2.80 },
+            "377": { "shortFare": 1.82, "standardFare": 2.80 },
+            "378": { "shortFare": 1.82, "standardFare": 2.80 },
+            "379": { "shortFare": 1.82, "standardFare": 2.80 },
+            "380": { "shortFare": 1.82, "standardFare": 2.80 },
+            "381": { "shortFare": 1.82, "standardFare": 2.80 },
+            "382": { "shortFare": 1.82, "standardFare": 2.80 },
+            "383": { "shortFare": 1.82, "standardFare": 2.80 },
+            "385": { "shortFare": 1.82, "standardFare": 2.80 },
+            "417": { "shortFare": 1.82, "standardFare": 2.80 },
+            "419": { "shortFare": 1.82, "standardFare": 2.80 },
+            "420": { "shortFare": 1.82, "standardFare": 2.80 },
+            "421": { "shortFare": 1.82, "standardFare": 2.80 },
+            "422": { "shortFare": 1.82, "standardFare": 2.80 },
+            "423": { "shortFare": 1.82, "standardFare": 2.80 },
+            "424": { "shortFare": 1.82, "standardFare": 2.80 },
+            "425": { "shortFare": 1.82, "standardFare": 2.80 },
+            "425A": { "shortFare": 1.82, "standardFare": 2.80 },
+            "429": { "shortFare": 1.82, "standardFare": 2.80 },
+            "434": { "shortFare": 1.82, "standardFare": 2.80 },
+            "440": { "shortFare": 1.82, "standardFare": 2.80 },
+            "442": { "shortFare": 1.82, "standardFare": 2.80 },
+            "444": { "shortFare": 1.82, "standardFare": 2.80 },
+            "445": { "shortFare": 1.82, "standardFare": 2.80 },
+            "446": { "shortFare": 1.82, "standardFare": 2.80 },
+            "447": { "shortFare": 1.82, "standardFare": 2.80 },
+            "448": { "shortFare": 1.82, "standardFare": 2.80 },
+            "450": { "shortFare": 1.82, "standardFare": 2.80 },
+            "451": { "shortFare": 1.82, "standardFare": 2.80 },
+            "455": { "shortFare": 1.82, "standardFare": 2.80 },
+            "456": { "shortFare": 1.82, "standardFare": 2.80 },
+            "457": { "shortFare": 1.82, "standardFare": 2.80 },
+            "458": { "shortFare": 1.82, "standardFare": 2.80 },
+            "461": { "shortFare": 1.82, "standardFare": 2.80 },
+            "462": { "shortFare": 1.82, "standardFare": 2.80 },
+            "463": { "shortFare": 1.82, "standardFare": 2.80 },
+            "464": { "shortFare": 1.82, "standardFare": 2.80 },
+            "465": { "shortFare": 1.82, "standardFare": 2.80 },
+            "466": { "shortFare": 1.82, "standardFare": 2.80 },
+            "467": { "shortFare": 1.82, "standardFare": 2.80 },
+            "470": { "shortFare": 1.82, "standardFare": 2.80 },
+            "471": { "shortFare": 1.82, "standardFare": 2.80 },
+            "480": { "shortFare": 1.82, "standardFare": 2.80 },
+            "483": { "shortFare": 1.82, "standardFare": 2.80 },
+            "487": { "shortFare": 1.82, "standardFare": 2.80 },
+            "489": { "shortFare": 1.82, "standardFare": 2.80 },
+            "490": { "shortFare": 1.82, "standardFare": 2.80 },
+            "491": { "shortFare": 1.82, "standardFare": 2.80 },
+            "492": { "shortFare": 1.82, "standardFare": 2.80 },
+            "494": { "shortFare": 1.82, "standardFare": 2.80 },
+            "65": { "shortFare": 1.82, "standardFare": 2.80 },
+            "70": { "shortFare": 1.82, "standardFare": 2.80 },
+            "72": { "shortFare": 1.82, "standardFare": 2.80 },
+            "73": { "shortFare": 1.82, "standardFare": 2.80 },
+            "NX": { "shortFare": 1.82, "standardFare": 2.80 },
+            "other": { "defaultFare": 2.17 }
         };
 
-        // Favorites data
         let favorites = JSON.parse(localStorage.getItem('busFavorites')) || {
             buses: [],
             stops: []
         };
 
-        // Journey history
         let journeyHistory = JSON.parse(localStorage.getItem('journeyHistory')) || [];
-        let currentBus = null;
-        let currentFilter = 'all';
 
         function populateBusOptions(filter = '') {
             const busOptionsContainer = document.getElementById('bus-options');
             const favoritesContainer = document.getElementById('favorites-container');
             const favoriteBusOptions = document.getElementById('favorite-bus-options');
             
-            // Clear all options except the "Other" option
             busOptionsContainer.innerHTML = '<div class="bus-option" onclick="selectBus(\'other\')">Other</div>';
             
-            // Clear favorites
             favoriteBusOptions.innerHTML = '';
             
-            // Check if we have any favorites to show
             const hasFavorites = favorites.buses.length > 0;
             favoritesContainer.style.display = hasFavorites ? 'block' : 'none';
             
-            // Add priority routes first
             PRIORITY_ROUTES.forEach(busNumber => {
                 if (filter && !busNumber.toLowerCase().includes(filter.toLowerCase())) {
                     return;
@@ -1151,15 +1013,13 @@
                 const busOption = createBusOption(busNumber, isFavorite);
                 
                 if (isFavorite) {
-                    favoriteBusOptions.appendChild(busOption.cloneNode(true));
+                    favoriteBusOptions.appendChild(busOption);
                 } else {
-                    busOptionsContainer.insertBefore(busOption, busOptionsContainer.firstChild.nextSibling);
+                    busOptionsContainer.appendChild(busOption);
                 }
             });
             
-            // Add remaining bus options
             Object.keys(busRoutes).forEach(busNumber => {
-                // Skip if already added as priority route
                 if (PRIORITY_ROUTES.includes(busNumber)) return;
                 
                 if (filter && !busNumber.toLowerCase().includes(filter.toLowerCase())) {
@@ -1170,7 +1030,7 @@
                 const busOption = createBusOption(busNumber, isFavorite);
                 
                 if (isFavorite) {
-                    favoriteBusOptions.appendChild(busOption.cloneNode(true));
+                    favoriteBusOptions.appendChild(busOption);
                 } else {
                     busOptionsContainer.appendChild(busOption);
                 }
@@ -1180,10 +1040,11 @@
         function createBusOption(busNumber, isFavorite) {
             const busOption = document.createElement('div');
             busOption.className = `bus-option ${isFavorite ? 'favorite' : ''}`;
+            busOption.setAttribute('data-bus-number', busNumber);
             busOption.innerHTML = `
                 ${busNumber}
                 <span class="star" onclick="toggleBusFavorite(event, '${busNumber}')">
-                    ${isFavorite ? '★' : '☆'}
+                    ${isFavorite ? '★' : '☆' }
                 </span>
             `;
             busOption.onclick = function() {
@@ -1198,49 +1059,49 @@
         }
 
         function selectBus(busNumber) {
-            // Toggle selection if clicking the same bus again
+            document.querySelectorAll('.bus-option').forEach(option => {
+                option.classList.remove('selected');
+                option.style.backgroundColor = '';
+                option.style.color = '';
+                
+                if (option.classList.contains('favorite')) {
+                    option.style.border = '2px solid #5c068c';
+                }
+            });
+            
             if (currentBus === busNumber) {
                 currentBus = null;
                 document.querySelectorAll('.bus-option').forEach(option => {
-                    option.classList.remove('selected');
                     option.classList.remove('hidden');
                 });
                 return;
             }
             
-            // Update UI
+            currentBus = busNumber;
+            
             document.querySelectorAll('.bus-option').forEach(option => {
-                option.classList.remove('selected');
-                
-                // Hide non-selected, non-favorite routes
-                if (!option.textContent.includes(busNumber) && 
-                    !favorites.buses.some(fav => option.textContent.includes(fav)) &&
-                    !(busNumber === 'other' && option.textContent === 'Other')) {
+                if (option.getAttribute('data-bus-number') !== busNumber) {
                     option.classList.add('hidden');
-                } else {
-                    option.classList.remove('hidden');
                 }
             });
             
-            // Highlight selected bus
-            const selectedOption = [...document.querySelectorAll('.bus-option')].find(option => 
-                option.textContent.includes(busNumber) || 
-                (busNumber === 'other' && option.textContent === 'Other')
-            );
-            
+            const selectedOption = document.querySelector(`.bus-option[data-bus-number="${busNumber}"]`);
             if (selectedOption) {
                 selectedOption.classList.add('selected');
+                if (selectedOption.classList.contains('favorite')) {
+                    selectedOption.style.backgroundColor = '#5c068c';
+                } else {
+                    selectedOption.style.backgroundColor = '#00796b';
+                }
+                selectedOption.style.color = 'white';
             }
             
-            currentBus = busNumber;
-            
-            // Clear previous suggestions
             document.getElementById('origin-suggestions').innerHTML = '';
             document.getElementById('destination-suggestions').innerHTML = '';
             
             if (busNumber === 'other') {
                 document.getElementById('price-display').style.display = 'block';
-                document.getElementById('price-amount').textContent = '€1.00';
+                document.getElementById('price-amount').textContent = '€2.17';
             } else {
                 document.getElementById('price-display').style.display = 'none';
             }
@@ -1266,13 +1127,14 @@
                     ${stop}
                     <span class="star ${isFavorite ? 'favorite' : ''}" 
                           onclick="toggleStopFavorite(event, '${stop}')">
-                        ${isFavorite ? '★' : '☆'}
+                        ${isFavorite ? '★' : '☆' }
                     </span>
                 `;
                 stopItem.onclick = function() {
                     document.getElementById(type).value = stop;
                     suggestionsContainer.innerHTML = '';
                     calculatePrice();
+                    checkInputComplete(type);
                 };
                 suggestionsContainer.appendChild(stopItem);
             });
@@ -1281,7 +1143,7 @@
         function calculatePrice() {
             if (!currentBus || currentBus === 'other') {
                 document.getElementById('price-display').style.display = 'block';
-                document.getElementById('price-amount').textContent = '€1.00';
+                document.getElementById('price-amount').textContent = '€2.17';
                 return;
             }
             
@@ -1293,11 +1155,10 @@
             const distance = calculateDistance(origin, destination, currentBus);
             if (distance === null) {
                 document.getElementById('price-display').style.display = 'block';
-                document.getElementById('price-amount').textContent = '€1.00';
+                document.getElementById('price-amount').textContent = '€2.17';
                 return;
             }
             
-            // Determine fare type based on distance (3 stops or less = short fare)
             const isShortFare = distance <= 3;
             const price = isShortFare ? ticketPrices[currentBus].shortFare : ticketPrices[currentBus].standardFare;
             
@@ -1327,12 +1188,10 @@
             
             localStorage.setItem('busFavorites', JSON.stringify(favorites));
             
-            // Update UI
             const starElement = event.target;
             starElement.textContent = index === -1 ? '★' : '☆';
             starElement.parentElement.classList.toggle('favorite');
             
-            // Repopulate the bus options to reflect changes
             populateBusOptions(document.getElementById('route-search').value);
         }
 
@@ -1348,9 +1207,45 @@
             
             localStorage.setItem('busFavorites', JSON.stringify(favorites));
             
-            // Update UI
             event.target.classList.toggle('favorite');
             event.target.textContent = index === -1 ? '★' : '☆';
+        }
+
+        function checkInputComplete(inputType) {
+            const input = document.getElementById(inputType);
+            const container = input.parentElement;
+            
+            if (input.value.trim()) {
+                container.classList.add('input-focused');
+                
+                if (isCompleteInput(input.value)) {
+                    container.classList.add('input-complete');
+                    if (inputType === 'origin') {
+                        originComplete = true;
+                    } else {
+                        destinationComplete = true;
+                    }
+                }
+            } else {
+                container.classList.remove('input-focused');
+                container.classList.remove('input-complete');
+                if (inputType === 'origin') {
+                    originComplete = false;
+                } else {
+                    destinationComplete = false;
+                }
+            }
+        }
+
+        function isCompleteInput(value) {
+            return value.trim().length > 3 && value.includes(' ');
+        }
+
+        function delayedInputComplete(inputType, event) {
+            clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => {
+                checkInputComplete(inputType);
+            }, 3000);
         }
 
         function saveJourney() {
@@ -1363,11 +1258,14 @@
                 return;
             }
             
-            // Save locations
+            // Play purchase sound if enabled
+            if (localStorage.getItem('soundEnabled') !== 'false') {
+                purchaseSound.play();
+            }
+            
             localStorage.setItem('ticketOrigin', origin);
             localStorage.setItem('ticketDestination', destination);
             
-            // Add to journey history
             const journey = {
                 bus: currentBus,
                 origin: origin,
@@ -1377,16 +1275,11 @@
                 completed: false
             };
             
-            journeyHistory.unshift(journey); // Add to beginning
+            journeyHistory.unshift(journey);
             localStorage.setItem('journeyHistory', JSON.stringify(journeyHistory));
             
-            // Redirect to ticket page
             window.location.href = 'index.html';
         }
-
-        document.querySelector('.exit-arrow').addEventListener('click', function() {
-            window.history.back();
-        });
     </script>
 </body>
 </html>
