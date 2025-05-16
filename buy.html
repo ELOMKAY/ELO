@@ -386,7 +386,7 @@
         }
 
         .footer button.active {
-            color: #006f5f;
+            color: #00796b;
         }
 
         .footer button img {
@@ -577,10 +577,9 @@
         let destinationComplete = false;
 
         // Audio elements
-        const purchaseSound = new Audio('purchase.mp3');
-        purchaseSound.preload = 'auto';
         const popSound = new Audio('pop.mp3');
         popSound.preload = 'auto';
+        let purchaseSound; // Will be initialized when needed
 
         function checkPasscode() {
             const input = document.getElementById('passcodeInput').value;
@@ -615,7 +614,7 @@
             }
             
             if (localStorage.getItem('soundEnabled') !== 'false') {
-                popSound.play();
+                popSound.play().catch(e => console.error('Sound error:', e));
             }
             
             document.getElementById('updateAlert').style.display = 'none';
@@ -1260,9 +1259,22 @@
             
             // Play purchase sound if enabled
             if (localStorage.getItem('soundEnabled') !== 'false') {
-                purchaseSound.play();
+                purchaseSound = new Audio('purchase.mp3');
+                purchaseSound.play()
+                    .then(() => {
+                        console.log("Purchase sound played successfully");
+                        saveJourneyData(origin, destination, price);
+                    })
+                    .catch(error => {
+                        console.error("Sound error:", error);
+                        saveJourneyData(origin, destination, price);
+                    });
+            } else {
+                saveJourneyData(origin, destination, price);
             }
-            
+        }
+
+        function saveJourneyData(origin, destination, price) {
             localStorage.setItem('ticketOrigin', origin);
             localStorage.setItem('ticketDestination', destination);
             
