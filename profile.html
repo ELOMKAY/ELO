@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFI Go - Profile</title>
     <style>
-        /* Lock Screen Styles */
         .lock-screen {
             position: fixed;
             top: 0;
@@ -52,7 +51,74 @@
             display: none;
         }
 
-        /* Main App Styles */
+        .update-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .update-alert-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .update-alert h2 {
+            color: #5c068c;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .update-alert ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        .update-alert li {
+            margin-bottom: 8px;
+        }
+
+        .update-alert-checkbox {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .update-alert-checkbox input {
+            margin-right: 10px;
+        }
+
+        .update-alert-button {
+            background-color: #5c068c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -66,7 +132,7 @@
             margin: 0 auto;
             background-color: white;
             text-align: center;
-            padding-bottom: 80px;
+            padding-bottom: 70px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             min-height: 100vh;
             position: relative;
@@ -76,7 +142,7 @@
         .header {
             background-color: #00796b;
             color: white;
-            padding: 20px;
+            padding: 15px;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
@@ -97,13 +163,22 @@
             width: 20px;
             height: 20px;
             position: absolute;
-            left: 20px;
+            left: 15px;
+            filter: brightness(0) invert(1);
+            cursor: pointer;
+        }
+
+        .settings-icon {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            right: 15px;
             filter: brightness(0) invert(1);
             cursor: pointer;
         }
 
         .profile-picture-container {
-            margin: 30px auto;
+            margin: 25px auto;
             width: 150px;
             height: 150px;
             border-radius: 50%;
@@ -136,10 +211,10 @@
             background-color: #5c068c;
             color: white;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -153,10 +228,10 @@
             background-color: #ff4444;
             color: white;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -166,7 +241,7 @@
         }
 
         .name-input {
-            margin: 20px auto;
+            margin: 15px auto;
             width: 90%;
             max-width: 500px;
         }
@@ -174,7 +249,7 @@
         .name-input label {
             display: block;
             margin-bottom: 8px;
-            font-size: 18px;
+            font-size: 16px;
             color: #00453c;
             font-weight: bold;
             text-align: left;
@@ -190,7 +265,7 @@
         }
 
         .spending-summary {
-            margin: 30px auto;
+            margin: 25px auto;
             width: 90%;
             max-width: 500px;
             padding: 15px;
@@ -207,13 +282,13 @@
         }
 
         .spending-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #00453c;
         }
 
         .spending-amount {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #5c068c;
         }
@@ -237,7 +312,7 @@
         }
 
         .journey-history {
-            margin: 30px auto;
+            margin: 25px auto;
             width: 90%;
             max-width: 500px;
             text-align: left;
@@ -247,10 +322,11 @@
             color: #00453c;
             border-bottom: 2px solid #00796b;
             padding-bottom: 5px;
+            font-size: 16px;
         }
 
         .journey-item {
-            padding: 15px;
+            padding: 12px;
             border-bottom: 1px solid #eee;
             position: relative;
         }
@@ -260,13 +336,14 @@
             margin-bottom: 5px;
             word-break: break-word;
             padding-right: 100px;
+            font-size: 15px;
         }
 
         .journey-details {
             display: flex;
             justify-content: space-between;
             color: #666;
-            font-size: 14px;
+            font-size: 13px;
             flex-wrap: wrap;
         }
 
@@ -277,8 +354,8 @@
 
         .journey-actions {
             position: absolute;
-            right: 15px;
-            top: 15px;
+            right: 12px;
+            top: 12px;
             display: flex;
             gap: 5px;
             flex-wrap: wrap;
@@ -289,7 +366,7 @@
             background-color: #00796b;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
             cursor: pointer;
@@ -304,7 +381,7 @@
             background-color: #ff4444;
             color: white;
             border: none;
-            padding: 5px;
+            padding: 4px;
             border-radius: 4px;
             font-size: 12px;
             cursor: pointer;
@@ -329,11 +406,11 @@
             background-color: #5c068c;
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 18px;
+            padding: 12px 25px;
+            font-size: 16px;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 30px;
+            margin-top: 20px;
             transition: background-color 0.3s;
         }
 
@@ -344,7 +421,7 @@
         .footer {
             display: flex;
             justify-content: space-around;
-            padding: 10px;
+            padding: 8px;
             border-top: 1px solid #ddd;
             background-color: white;
             position: fixed;
@@ -353,17 +430,19 @@
             right: 0;
             z-index: 100;
             display: none;
+            height: 60px;
         }
 
         .footer button {
             background: none;
             border: none;
-            font-size: 16px;
+            font-size: 14px;
             color: #585858;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 5px;
         }
 
         .footer button.active {
@@ -371,25 +450,28 @@
         }
 
         .footer button img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
+            width: 30px;
+            height: 30px;
+            margin-bottom: 3px;
             border-radius: 50%;
             object-fit: cover;
         }
 
         .footer button:first-child img {
-            width: 48px;
-            height: 48px;
-            filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+            width: 35px;
+            height: 35px;
         }
 
         .footer button:first-child {
-            margin-top: -4px;
+            margin-top: 0;
         }
 
         .footer button:nth-child(2) img {
             filter: brightness(0) saturate(100%) invert(36%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(98%) contrast(89%);
+        }
+
+        .footer button:nth-child(2).active img {
+            filter: brightness(0) saturate(100%) invert(22%) sepia(99%) saturate(2095%) hue-rotate(154deg) brightness(93%) contrast(101%);
         }
 
         .footer button:nth-child(3) img {
@@ -458,10 +540,134 @@
             z-index: 1000;
             display: none;
         }
+
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.3);
+            z-index: 1100;
+            width: 85%;
+            max-width: 450px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1050;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-title {
+            color: #5c068c;
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .settings-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #5c068c;
+            padding: 5px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .logout-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #5c068c;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
     </style>
 </head>
 <body>
-    <!-- Lock Screen -->
     <div class="lock-screen" id="lockScreen">
         <h2>Enter Passcode</h2>
         <input type="password" class="passcode-input" id="passcodeInput" placeholder="Enter passcode">
@@ -469,11 +675,30 @@
         <div class="passcode-error" id="passcodeError">Incorrect passcode. Please try again.</div>
     </div>
 
-    <!-- Main App Content -->
+    <div class="update-alert" id="updateAlert">
+        <div class="update-alert-content" id="updateAlertContent">
+            <h2>🛠 Important Updates</h2>
+            <ul>
+                <li>Updated Stops: 190, 100, 109X, and 168</li>
+                <li>Route 109 is now operational</li>
+                <li>Favorites are now fully functional and can be selected/deselected</li>
+                <li>Visual feedback for route selection has been improved</li>
+                <li>The app now includes sound feedback on some buttons</li>
+                <li>New Settings menu added (with toggle and logout)</li>
+            </ul>
+            <div class="update-alert-checkbox">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Don't show this message again</label>
+            </div>
+            <button class="update-alert-button" onclick="acknowledgeUpdate()">Acknowledge</button>
+        </div>
+    </div>
+
     <div class="profile-container" id="appContent">
         <div class="header">
             <img src="Exit.png" alt="Exit" class="exit-arrow" onclick="window.history.back()">
             <span>Profile</span>
+            <img src="GearIcon.png" alt="Settings" class="settings-icon" onclick="openSettings()">
         </div>
         
         <div class="profile-picture-container" onclick="document.getElementById('file-input').click()">
@@ -540,42 +765,107 @@
 
     <div id="delete-message" class="delete-message">Delete Complete</div>
 
+    <div class="settings-overlay" id="settingsOverlay"></div>
+    
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3 class="settings-title">Settings</h3>
+            <button class="settings-close" onclick="closeSettings()">×</button>
+        </div>
+        <div class="setting-item">
+            <span>Sound Feedback</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="soundToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <button class="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+
     <script>
-        // Passcode and Auto-Lock Functionality
         const PASSCODE = "T9C9M10";
         let autoLockTimer;
-        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000;
         let journeyToDelete = null;
         let totalSpending = parseFloat(localStorage.getItem('totalSpending')) || 0;
         let currentFilter = 'all';
+
+        // Audio elements
+        const popSound = new Audio('pop-trimmed.mp3');
+        popSound.preload = 'auto';
+        popSound.volume = 0.7;
+        
+        const checkSound = new Audio('check.mp3');
+        checkSound.preload = 'auto';
+        checkSound.volume = 0.7;
 
         function checkPasscode() {
             const input = document.getElementById('passcodeInput').value;
             const errorElement = document.getElementById('passcodeError');
             
             if (input === PASSCODE) {
-                // Correct passcode
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                document.getElementById('appFooter').style.display = 'flex';
+                const dontShowAgain = localStorage.getItem('dontShowUpdates');
                 
-                // Start session
-                sessionStorage.setItem('authenticated', 'true');
-                resetAutoLockTimer();
+                if (dontShowAgain !== 'true') {
+                    document.getElementById('updateAlert').style.display = 'flex';
+                } else {
+                    playSoundAndUnlock();
+                }
             } else {
-                // Incorrect passcode
                 errorElement.style.display = 'block';
                 document.getElementById('passcodeInput').value = '';
             }
         }
 
+        function playSoundAndUnlock() {
+            popSound.play()
+                .then(() => unlockApp())
+                .catch((error) => {
+                    console.error('Audio playback failed:', error);
+                    unlockApp();
+                });
+        }
+
+        function unlockApp() {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('appFooter').style.display = 'flex';
+            sessionStorage.setItem('authenticated', 'true');
+            resetAutoLockTimer();
+            
+            // Initialize sound settings
+            const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+            document.getElementById('soundToggle').checked = soundEnabled;
+        }
+
+        function acknowledgeUpdate() {
+            const dontShowAgain = document.getElementById('dontShowAgain').checked;
+            if (dontShowAgain) {
+                localStorage.setItem('dontShowUpdates', 'true');
+            }
+            
+            popSound.play()
+                .then(() => unlockApp())
+                .catch((error) => {
+                    console.error('Audio playback failed:', error);
+                    unlockApp();
+                });
+        }
+
+        document.getElementById('updateAlert').addEventListener('click', function(e) {
+            if (e.target === this) {
+                const content = document.getElementById('updateAlertContent');
+                content.classList.add('shake');
+                setTimeout(() => {
+                    content.classList.remove('shake');
+                }, 500);
+            }
+        });
+
         function resetAutoLockTimer() {
-            // Clear existing timer
             if (autoLockTimer) {
                 clearTimeout(autoLockTimer);
             }
-            
-            // Set new timer
             autoLockTimer = setTimeout(lockApp, LOCK_TIMEOUT);
         }
 
@@ -588,26 +878,45 @@
             sessionStorage.removeItem('authenticated');
         }
 
-        // Check authentication on page load
+        function openSettings() {
+            document.getElementById('settingsOverlay').style.display = 'block';
+            document.getElementById('settingsPanel').style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsOverlay').style.display = 'none';
+            document.getElementById('settingsPanel').style.display = 'none';
+        }
+
+        function logout() {
+            sessionStorage.removeItem('authenticated');
+            localStorage.removeItem('profilePicture');
+            localStorage.removeItem('userName');
+            lockApp();
+            closeSettings();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             if (sessionStorage.getItem('authenticated') === 'true') {
                 document.getElementById('lockScreen').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
                 document.getElementById('appFooter').style.display = 'flex';
                 resetAutoLockTimer();
+                
+                // Initialize sound settings
+                const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+                document.getElementById('soundToggle').checked = soundEnabled;
             } else {
                 document.getElementById('lockScreen').style.display = 'flex';
                 document.getElementById('appContent').style.display = 'none';
                 document.getElementById('appFooter').style.display = 'none';
             }
 
-            // Set up event listeners for user activity
             document.addEventListener('click', resetAutoLockTimer);
             document.addEventListener('keypress', resetAutoLockTimer);
             document.addEventListener('scroll', resetAutoLockTimer);
             document.addEventListener('mousemove', resetAutoLockTimer);
 
-            // Load saved profile picture
             const savedPicture = localStorage.getItem('profilePicture');
             if (savedPicture) {
                 const profilePic = document.getElementById('profile-picture');
@@ -617,7 +926,6 @@
                 document.getElementById('remove-picture-btn').style.display = 'flex';
             }
 
-            // Set up file input
             document.getElementById('file-input').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -633,31 +941,31 @@
                 }
             });
 
-            // Load name
             const savedName = localStorage.getItem('userName');
             if (savedName) {
                 document.getElementById('name').value = savedName;
             }
 
-            // Load and display journey history
             loadJourneyHistory();
             updateTotalSpendingDisplay();
+            
+            // Handle sound toggle
+            document.getElementById('soundToggle').addEventListener('change', function() {
+                localStorage.setItem('soundEnabled', this.checked);
+            });
         });
 
         function removeProfilePicture(event) {
             event.stopPropagation();
             
-            // Remove picture from display
             const profilePic = document.getElementById('profile-picture');
             profilePic.src = '';
             profilePic.style.display = 'none';
             document.querySelector('.profile-picture-placeholder').style.display = 'block';
             document.getElementById('remove-picture-btn').style.display = 'none';
             
-            // Remove from storage
             localStorage.removeItem('profilePicture');
             
-            // Show confirmation
             const deleteMessage = document.getElementById('delete-message');
             deleteMessage.textContent = "Profile picture removed";
             deleteMessage.style.display = 'block';
@@ -677,7 +985,6 @@
                 return;
             }
             
-            // Filter journeys based on current time period
             const now = new Date();
             let filteredJourneys = journeyHistory;
             
@@ -699,7 +1006,6 @@
                 });
             }
             
-            // Display filtered journeys
             filteredJourneys.forEach(journey => {
                 const journeyDate = new Date(journey.date);
                 const formattedDate = journeyDate.toLocaleDateString('en-GB', {
@@ -726,7 +1032,7 @@
                             ${journey.completed ? 'Completed' : 'Mark Complete'}
                         </button>
                         <button class="delete-btn" onclick="showDeleteConfirmation('${journey.date}')">
-                            🗑️
+                            <img src="delete.png" alt="Delete" style="width:12px;height:12px;">
                         </button>
                     </div>
                 `;
@@ -739,7 +1045,6 @@
         }
 
         function filterJourneys(period) {
-            // Update active time period
             document.querySelectorAll('.time-period').forEach(button => {
                 button.classList.remove('active');
                 if (button.textContent.toLowerCase().includes(period)) {
@@ -758,20 +1063,23 @@
             const journeyIndex = journeyHistory.findIndex(j => j.date === journeyDate);
             if (journeyIndex !== -1) {
                 const wasCompleted = journeyHistory[journeyIndex].completed;
-                journeyHistory[journeyIndex].completed = !wasCompleted;
+                
+                // Prevent unmarking completed journeys
+                if (wasCompleted) return;
+                
+                journeyHistory[journeyIndex].completed = true;
                 localStorage.setItem('journeyHistory', JSON.stringify(journeyHistory));
                 
-                // Update button appearance
-                event.target.classList.toggle('completed');
-                event.target.textContent = journeyHistory[journeyIndex].completed ? 'Completed' : 'Mark Complete';
+                event.target.classList.add('completed');
+                event.target.textContent = 'Completed';
                 
-                // Update total spending if journey was marked complete
-                if (!wasCompleted && journeyHistory[journeyIndex].completed) {
-                    const priceValue = parseFloat(journeyHistory[journeyIndex].price.replace('€', ''));
-                    totalSpending += priceValue;
-                    localStorage.setItem('totalSpending', totalSpending);
-                    updateTotalSpendingDisplay();
-                }
+                // Play check sound
+                checkSound.play().catch(e => console.error('Check sound failed:', e));
+                
+                const priceValue = parseFloat(journeyHistory[journeyIndex].price.replace('€', ''));
+                totalSpending += priceValue;
+                localStorage.setItem('totalSpending', totalSpending);
+                updateTotalSpendingDisplay();
             }
         }
 
@@ -786,7 +1094,6 @@
                 const journeyIndex = journeyHistory.findIndex(j => j.date === journeyToDelete);
                 
                 if (journeyIndex !== -1) {
-                    // If journey was completed, subtract its price from total spending
                     if (journeyHistory[journeyIndex].completed) {
                         const priceValue = parseFloat(journeyHistory[journeyIndex].price.replace('€', ''));
                         totalSpending -= priceValue;
@@ -796,7 +1103,6 @@
                     journeyHistory.splice(journeyIndex, 1);
                     localStorage.setItem('journeyHistory', JSON.stringify(journeyHistory));
                     
-                    // Show delete message
                     const deleteMessage = document.getElementById('delete-message');
                     deleteMessage.style.display = 'block';
                     setTimeout(() => {
@@ -823,7 +1129,6 @@
                 updateTotalSpendingDisplay();
                 loadJourneyHistory();
                 
-                // Show confirmation message
                 const deleteMessage = document.getElementById('delete-message');
                 deleteMessage.textContent = "Spending reset complete";
                 deleteMessage.style.display = 'block';
@@ -844,6 +1149,7 @@
                     localStorage.setItem('profilePicture', profilePic);
                 }
                 
+                popSound.play().catch(e => console.error('Save sound failed:', e));
                 alert('Profile saved successfully!');
                 window.location.href = 'index.html';
             } else {
