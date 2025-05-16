@@ -62,6 +62,13 @@
             z-index: 2000;
             justify-content: center;
             align-items: center;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .update-alert.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .update-alert-content {
@@ -583,7 +590,7 @@
                 <input type="checkbox" id="dontShowAgain">
                 <label for="dontShowAgain">Don't show this message again</label>
             </div>
-            <button class="update-alert-button" onclick="acknowledgeUpdate()">Acknowledge</button>
+            <button class="update-alert-button" id="acknowledgeButton">Acknowledge</button>
         </div>
     </div>
 
@@ -679,7 +686,7 @@
                 const dontShowAgain = localStorage.getItem('dontShowUpdates');
                 
                 if (dontShowAgain !== 'true') {
-                    document.getElementById('updateAlert').style.display = 'flex';
+                    showUpdateAlert();
                 } else {
                     playSoundAndUnlock();
                 }
@@ -689,9 +696,24 @@
             }
         }
 
+        function showUpdateAlert() {
+            const updateAlert = document.getElementById('updateAlert');
+            updateAlert.style.display = 'flex';
+            updateAlert.classList.remove('hidden');
+            
+            // Clear any previous listeners
+            const acknowledgeButton = document.getElementById('acknowledgeButton');
+            acknowledgeButton.onclick = null;
+            
+            // Add new listener
+            acknowledgeButton.addEventListener('click', acknowledgeUpdate);
+        }
+
         function playSoundAndUnlock() {
             popSound.play()
-                .then(() => unlockApp())
+                .then(() => {
+                    unlockApp();
+                })
                 .catch((error) => {
                     console.error('Audio playback failed:', error);
                     unlockApp();
@@ -712,12 +734,13 @@
                 localStorage.setItem('dontShowUpdates', 'true');
             }
             
-            popSound.play()
-                .then(() => unlockApp())
-                .catch((error) => {
-                    console.error('Audio playback failed:', error);
-                    unlockApp();
-                });
+            const updateAlert = document.getElementById('updateAlert');
+            updateAlert.classList.add('hidden');
+            
+            setTimeout(() => {
+                updateAlert.style.display = 'none';
+                playSoundAndUnlock();
+            }, 300);
         }
 
         document.getElementById('updateAlert').addEventListener('click', function(e) {
