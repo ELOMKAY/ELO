@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFI Go Ticket</title>
     <style>
-        /* Lock Screen Styles */
         .lock-screen {
             position: fixed;
             top: 0;
@@ -52,7 +51,74 @@
             display: none;
         }
 
-        /* Main App Styles */
+        .update-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .update-alert-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .update-alert h2 {
+            color: #5c068c;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .update-alert ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        .update-alert li {
+            margin-bottom: 8px;
+        }
+
+        .update-alert-checkbox {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .update-alert-checkbox input {
+            margin-right: 10px;
+        }
+
+        .update-alert-button {
+            background-color: #5c068c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -70,7 +136,7 @@
             margin: 0 auto;
             background-color: white;
             text-align: center;
-            padding: 0 0 80px;
+            padding: 0 0 70px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             flex: 1;
             position: relative;
@@ -80,7 +146,7 @@
         .header {
             background-color: #00796b;
             color: white;
-            padding: 20px;
+            padding: 15px;
             font-size: 16px;
             font-weight: bold;
             text-align: center;
@@ -103,14 +169,14 @@
             width: 20px;
             height: 20px;
             position: absolute;
-            left: 20px;
+            left: 15px;
             filter: brightness(0) invert(1);
         }
 
         .bus-logo {
             width: 340px;
             height: auto;
-            margin-top: 20px;
+            margin-top: 15px;
             display: block;
             margin-left: auto;
             margin-right: auto;
@@ -365,7 +431,7 @@
         .footer {
             display: flex;
             justify-content: space-around;
-            padding: 10px;
+            padding: 8px;
             border-top: 1px solid #ddd;
             background-color: white;
             border-radius: 0 0 8px 8px;
@@ -375,17 +441,19 @@
             right: 0;
             z-index: 100;
             display: none;
+            height: 60px;
         }
 
         .footer button {
             background: none;
             border: none;
-            font-size: 16px;
+            font-size: 14px;
             color: #585858;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 5px;
         }
 
         .footer button.active {
@@ -393,20 +461,20 @@
         }
 
         .footer button img {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 5px;
+            width: 30px;
+            height: 30px;
+            margin-bottom: 3px;
             border-radius: 50%;
             object-fit: cover;
         }
 
         .footer button:first-child img {
-            width: 48px;
-            height: 48px;
+            width: 35px;
+            height: 35px;
         }
 
         .footer button:first-child {
-            margin-top: -4px;
+            margin-top: 0;
         }
 
         .footer button:nth-child(2) img {
@@ -493,7 +561,6 @@
     </style>
 </head>
 <body>
-    <!-- Lock Screen -->
     <div class="lock-screen" id="lockScreen">
         <h2>Enter Passcode</h2>
         <input type="password" class="passcode-input" id="passcodeInput" placeholder="Enter passcode">
@@ -501,7 +568,25 @@
         <div class="passcode-error" id="passcodeError">Incorrect passcode. Please try again.</div>
     </div>
 
-    <!-- Main App Content -->
+    <div class="update-alert" id="updateAlert">
+        <div class="update-alert-content" id="updateAlertContent">
+            <h2>🛠 Important Updates</h2>
+            <ul>
+                <li>Updated Stops: 190, 100, 109X, and 168</li>
+                <li>Route 109 is now operational</li>
+                <li>Favorites are now fully functional and can be selected/deselected</li>
+                <li>Visual feedback for route selection has been improved</li>
+                <li>The app now includes sound feedback on some buttons</li>
+                <li>New Settings menu added (with toggle and logout)</li>
+            </ul>
+            <div class="update-alert-checkbox">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Don't show this message again</label>
+            </div>
+            <button class="update-alert-button" onclick="acknowledgeUpdate()">Acknowledge</button>
+        </div>
+    </div>
+
     <div class="ticket-container" id="appContent">
         <div class="header">
             <img src="Exit.png" alt="Exit" class="exit-arrow">
@@ -578,38 +663,77 @@
     </div>
 
     <script>
-        // Passcode and Auto-Lock Functionality
         const PASSCODE = "T9C9M10";
         let autoLockTimer;
-        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+        const LOCK_TIMEOUT = 3 * 60 * 60 * 1000;
+
+        // Audio elements
+        const popSound = new Audio('pop-trimmed.mp3');
+        popSound.preload = 'auto';
 
         function checkPasscode() {
             const input = document.getElementById('passcodeInput').value;
             const errorElement = document.getElementById('passcodeError');
             
             if (input === PASSCODE) {
-                // Correct passcode
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                document.getElementById('appFooter').style.display = 'flex';
+                const dontShowAgain = localStorage.getItem('dontShowUpdates');
                 
-                // Start session
-                sessionStorage.setItem('authenticated', 'true');
-                resetAutoLockTimer();
+                if (dontShowAgain !== 'true') {
+                    document.getElementById('updateAlert').style.display = 'flex';
+                } else {
+                    playSoundAndUnlock();
+                }
             } else {
-                // Incorrect passcode
                 errorElement.style.display = 'block';
                 document.getElementById('passcodeInput').value = '';
             }
         }
 
+        function playSoundAndUnlock() {
+            popSound.play()
+                .then(() => unlockApp())
+                .catch((error) => {
+                    console.error('Audio playback failed:', error);
+                    unlockApp();
+                });
+        }
+
+        function unlockApp() {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('appFooter').style.display = 'flex';
+            sessionStorage.setItem('authenticated', 'true');
+            resetAutoLockTimer();
+        }
+
+        function acknowledgeUpdate() {
+            const dontShowAgain = document.getElementById('dontShowAgain').checked;
+            if (dontShowAgain) {
+                localStorage.setItem('dontShowUpdates', 'true');
+            }
+            
+            popSound.play()
+                .then(() => unlockApp())
+                .catch((error) => {
+                    console.error('Audio playback failed:', error);
+                    unlockApp();
+                });
+        }
+
+        document.getElementById('updateAlert').addEventListener('click', function(e) {
+            if (e.target === this) {
+                const content = document.getElementById('updateAlertContent');
+                content.classList.add('shake');
+                setTimeout(() => {
+                    content.classList.remove('shake');
+                }, 500);
+            }
+        });
+
         function resetAutoLockTimer() {
-            // Clear existing timer
             if (autoLockTimer) {
                 clearTimeout(autoLockTimer);
             }
-            
-            // Set new timer
             autoLockTimer = setTimeout(lockApp, LOCK_TIMEOUT);
         }
 
@@ -622,7 +746,6 @@
             sessionStorage.removeItem('authenticated');
         }
 
-        // Check authentication on page load
         document.addEventListener('DOMContentLoaded', function() {
             if (sessionStorage.getItem('authenticated') === 'true') {
                 document.getElementById('lockScreen').style.display = 'none';
@@ -635,13 +758,11 @@
                 document.getElementById('appFooter').style.display = 'none';
             }
 
-            // Set up event listeners for user activity
             document.addEventListener('click', resetAutoLockTimer);
             document.addEventListener('keypress', resetAutoLockTimer);
             document.addEventListener('scroll', resetAutoLockTimer);
             document.addEventListener('mousemove', resetAutoLockTimer);
 
-            // Load saved data
             const savedOrigin = localStorage.getItem('ticketOrigin');
             const savedDestination = localStorage.getItem('ticketDestination');
             
@@ -654,22 +775,18 @@
                 document.getElementById('ticket-destination').textContent = savedDestination;
             }
 
-            // Load user name
             const savedName = localStorage.getItem('userName');
             if (savedName) {
                 document.getElementById('user-name').textContent = savedName;
             }
 
-            // Generate random ticket ID
             document.getElementById("ticket-id").textContent = Math.floor(1000000 + Math.random() * 9000000);
 
-            // Set dates
             const now = new Date();
             const validUntil = new Date(now.getTime() + 4 * 60 * 60 * 1000);
             document.getElementById("activation-date").textContent = formatDateTime(now);
             document.getElementById("valid-until-date").textContent = formatDateTime(validUntil);
 
-            // Start clock
             updateDateTime();
             setInterval(updateDateTime, 1000);
         });
@@ -706,11 +823,9 @@
             box.classList.toggle('hidden');
             
             if (box.classList.contains('hidden')) {
-                // Resuming animation
                 circle.classList.remove('stopped');
                 yaText.classList.remove('stopped');
             } else {
-                // Pausing animation
                 circle.classList.add('stopped');
                 yaText.classList.add('stopped');
             }
